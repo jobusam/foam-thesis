@@ -1,0 +1,120 @@
+\section{Hadoop\textsuperscript{\textregistered} Framework}
+\noindent
+Apache Hadoop ist ein etabliertes Java-Framework zur verteilten Speicherung und Verarbeitung von Daten. Durch die parallele Ausführung von Algorithmen eignet sich ein Hadoop-Cluster für rechenaufwendige Datenanalysen. Ein primäres Paradigma ist das Konzept der \textit{Datenlokalität}. Die auszuführenden Programme werden auf die Knoten verteilt, auf welchen auch die Daten liegen. Ressourcenintensive Datentransporte sollen weitgehend vermieden werden.\cite[S. 20 ff.]{big_data_praxis}\\ 
+Das Framework ist für die Ausführung auf Standardhardware konzeptioniert. Es wird also keine verhältnismäßig teure Spezialhardware benötigt. Das Cluster besteht aus vielen einzelnen Knoten mit Standardhardware, welche im Verhältnis zu Spezialhardware günstiger und leicht ersetzbar ist. Der Ausfall einzelner Knoten ist die Regel und wird bei der Datenhaltung entsprechend berücksichtigt. \\
+
+\noindent
+Das Apache Hadoop\textsuperscript{\textregistered} selbst besteht aus mehreren Komponenten, welche spezifische Aufgaben übernehmen. Abbildung \ref{fig:hadoop_framework_structure} stellt eine grobe Skizzierung der Komponentenlandschaft von Apache Hadoop dar.\footnote{In der Abbildung \ref{fig:hadoop_framework_structure} werden Logos der einzelnen Apache Projekte verwendet. Diese sind Handelsmarken der \textit{Apache Source Foundation} (siehe \url{https://www.apache.org/}). In Kapitel \ref{sec:licencing_issues} im Anhang werden die Logos und deren Herkunft nochmals aufgelistet.}\\
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/hadoop_framework_structure.pdf}
+  \caption{Apache Hadoop Ökosystem (Vgl. \cite{big_data_praxis},\cite{expert_hadoop_admin}. Siehe Kapitel \ref{sec:licencing_issues})}
+  \label{fig:hadoop_framework_structure}
+\end{figure}
+
+\noindent
+Die Basis bildet das verteilte Dateisystem \textit{Hadoop Distributed File System (HDFS)}, welches die Daten redundant auf allen Knoten des Computer-Clusters speichert. Hierbei besteht das Computer-Cluster selbst aus mehreren Knoten, auf welchen vorzugsweise ein Linux-Betriebsystem, wie beispielsweise CentOS, arbeitet.\\
+Der Ressourcenmanager \textit{YARN (Yet Another Resource Negotiator)} ist für die Verteilung und Bereitstellung von verfügbarer Rechenleistung verantwortlich.\\ 
+Die dritte Komponente ist das \textit{Hadoop\textsuperscript{\textregistered} Map-Reduce Framework}. Hadoop Map-Reduce kann zur Datenverarbeitung genutzt werden. Hierbei werden Algorithmen parallel auf den Knoten prozessiert und die Ergebnisse im Anschluss zusammengetragen. Die einzelnen Zwischenergebnisse werden alle im HDFS abgelegt.\footnote{Sogenannte Map-Reduce Jobs bildeten in den Anfängen von Hadoop den primären Weg, Daten verteilt zu verarbeiten. Mittlerweile wurde diese Art der Datenverarbeitung in den Hintergrund verdrängt, da andere Projekte, wie beispielsweise Apache Spark, die Daten schneller verarbeiten können oder andere Ansätze zur Verarbeitung nutzen. Dies ist beispielsweise auch der Grund, weshalb Hadoop Map-Reduce in dieser Masterthesis nicht explizit verwendet wird.} \\
+
+\noindent
+Das verteilte Dateisystem HDFS und der Ressourcenmanager YARN bilden den Kern des Hadoop-Clusters. Darauf aufbauend können andere Komponenten die Daten verarbeiten oder spezielle Aufgaben durchführen.\\
+So wird beispielsweise in dieser Thesis \textit{Apache Spark\texttrademark\thinspace} bei der Prozessierung und Analyse der Daten genutzt. Der Vorteil von Apache Spark ist eine performante Datenverarbeitung, da einerseits die Daten verteilt verarbeitet werden und andererseits Zwischenergebnisse und temporäre Daten im Arbeitsspeicher der einzelnen Rechenknoten gehalten werden.\footnote{Durch das In-Memory Computing ist Apache Spark deutlich schneller als das bereits vorgestellte Hadoop Map-Reduce.}\\
+Desweiteren bietet \textit{Apache Hive\texttrademark\thinspace} eine Möglichkeit Dateien im HDFS mithilfe einer SQL ähnlichen Syntax\footnote{Dem sogenannten HiveQL.} abzufragen. Hierbei nutzt die Komponente wiederum das Map-Reduce Framework von Hadoop. Apache Hive ist jedoch keine reine Datenbank, sondern arbeitet auf den Dateien im HDFS.\\
+\textit{Apache HBASE\textsuperscript{\textregistered}} hingegen ist eine spaltenorientierte Key-Value Datenbank. Sie wurde eigens für Apache Hadoop implementiert, 
+um große Datenmengen performant zu speichern.\\
+
+\noindent
+Das Hadoop-Ökosystem als Ganzes muss auch konfiguriert und überwacht werden. Um die Verfügbarkeit einzelner Instanzen zu gewährleisten und gegebenenfalls redundante Verarbeitungswege anzubieten, wird \textit{Apache Zookeeper\texttrademark\thinspace} genutzt. Mit Zookeeper ist es auch möglich Konfigurationen und Änderungen im Cluster zu verteilen. Zum eigentlichen konfigurieren und überwachen des Hadoop-Clusters wird \textit{Apache Ambari\texttrademark\thinspace} genutzt.\\
+
+\noindent
+Zusätzlich existieren weitere Projekte im Hadoop-Ökosystem, welche für die forensische Analyseplattform von Verwendung sein können.
+Hierzu gehören:
+\begin{itemize}
+\item \textit{Apache Livy} zur Ausführung von Apache Spark Anwendung über eine REST-Schnittstelle.\footnote{\textit{Representational State Transfer (REST)} bezeichnet ein Programmierparadigma in verteilten Systemen. Hierbei werden Ressourcen über HTTP angefordert, gespeichert und verarbeitet.}
+\item \textit{Apache NiFi} ermöglicht das Aufbereiten von Daten und organisiert Datenimporte.
+\item \textit{Apache UIMA\texttrademark\thinspace} zur Analyse von unstrukturierten Daten, wie beispielsweise Texte und Mediadateien. \textbf{TODO: Kann UIMA überhaupt in Hadoop eingesetzt werden.}
+\item \textit{Apache Accumulo\textsuperscript{\textregistered}} als Alternative zu Apache HBASE?
+\end{itemize} 
+
+\noindent
+Prinzipiell sind viele Komponenten unabhängig voneinander. So kann ein HDFS ausschließlich zur Datenhaltung aufgebaut werden, ohne eine Komponente zur Datenverarbeitung verwenden zu müssen. Umgekehrt lassen sich Komponenten zur Datenverarbeitung, wie Apache Spark, auch ohne das HDFS und YARN nutzen und könnten damit auch in andere Umgebungen integriert werden. Die einzelnen Komponenten entfalten jedoch gerade durch die Kombination miteinander ihre Potential zur performanten Datenanalyse.\\
+
+\noindent
+Es gibt einige Unternehmen, die sich speziell daruf spezialisiert haben dieses Apache Hadoop Ökosystem und weiter noch nicht erwähnte Komponenten zu einzelnen Analyseplattformen zusammenzufassen. Sie bieten hierfür entsprechender kostenpflichtiger Support, wobei diese Plattformen im reinen Betriebe kostenfrei sind. So wird im Praxisteil der Masterthesis beispielsweise die \textit{Hortonworks Data Platform (HDP)} des Unternehmes \textit{Hortonworks} genutzt.
+
+
+\section{Hadoop HDFS}
+Das Hadoop Distributed Filesystem (HDFS) ist ein verteiltes Dateisystem, welches die Grundlage zu Speicherung von Daten im Hadoop-Ökosystem bietet. Nachfolgende Zwecke soll es erfüllen.\\
+Es soll ausfallsicher sein. In der Standardkonfiguration wird jede Datei dreifach auf unterschiedlichen physikalischen Knoten gespeichert. Damit kann selbt bei einem Ausfall von zwei Knoten immer noch auf die Datei zugegriffen werden. Darüber hinaus verteilt das HDFS die Dateien automatisch und regeneriert sich selbst nach Ausfällen von Knoten. In großen Computer-Clustern mit mehreren hunderten Knoten ist ein Ausfall eines Knoten kein Sonderfall sondern die Regel. Daher muss sich das HDFS selbst heilen können, um auch ohne manuelle Administration weiter verfügbar zu sein.\\
+Das HDFS (und auch Hadoop im allgemeinen) soll horizontal skalierbar sein. Wird mehr Speicher benötigt, sollen einfach noch Knoten hinzugefügt werden können.\\
+Das HDFS ist auf hohen Datendurchsatz und die Speicherung großer Datenmengen ausgelegt.
+So können einzelne Dateien mehrere Gigabyte bis hin zu Terrabyte groß seind und es können mehrere Millionen Dateien im HDFS gespeichert werden. Die Optimierung auf einen möglichst hohen Datendurchsatz geht mit einer schlechteren Reaktionszeit im Vergleich zu herkömlichen Dateisystemen einher.\\
+Das Prinzip \textit{Write-once-Read-many} wird im HDFS implementiert. Wenn Daten einmal geschrieben wurden, dann werden sie normalerweise nicht mehr geändert. Dies ermöglicht ein einfacheres Koherenzmodell. Dies fördert den Lesedurchsatz indem die Unterstützung der Modifikation von Daten stark eingechränkt wird. Ein wahlfreies Schreiben in eine existierende Datei wird beispielsweise nicht unterstützt. Änderungen an Daten, welche von Algorithmen vorgenommen werden, resultieren in neuen Datensätzen.\\
+Darüber hinaus gilt das Prinzip der Datenlokalität. Algorithmen werden dort ausgeführt, wo die Daten liegen, um das Verschieben von Daten über das Netzwerk zu vermeiden.\cite{hdfs_architecture}\\
+
+\noindent
+Der Aufbau eines HDFS bildet eine Master-Slave Architektur aus \textit{NameNodes} und \textit{DateNodes}. Der NameNode is einmalig im verteilten System vorhanden und enthält alle Metainformationen zu den Dateien. Eine Datei selbst wird in ein oder mehrere Blöcke aufgeteilt und auf mehreren DateNodes gespeichert. Der NameNode organisiert diese Speicherung und bestimmt, wo welche Daten persistiert werden. Über den NameNode selbst fließen aber keine Rohdaten von Dateiinhalten. Auf Dateisystemebene ist das HDFS wie gängige Dateisystem hierarchisch organisiert. Jede Datei wird über einen absoluten Pfad eindeutig bestimmt und erhält entsprechende Metadaten, wie Dateirechte und Zeitstempel.  \\
+
+\noindent
+Abbildung \ref{fig:hdfs_cluster_architecture} verdeutlicht die Struktur im HDFS. Angenommen es soll die Datei \path{/home/foo.txt} gespeichert werden. Dies kann mit dem Terminalprogramm \textit{hdfs} durchgeführt. Das Programm selbst ist hier der HDFS-Client und hat Zugang zum Hadoop-Cluster. Der HDFS-Client speichert zuerst die Metadaten der Datei auf dem Name Node. Der Name Node bekommt die Größe der Datei auch mit und entscheidet dann, in viele Blöcke sie unterteilt werden soll. Darauf hin ermittelt für jeden einzelnen Block, auf welchen Date Nodes dieser Block gespeichert werden soll. Diese Blockaufteilung und die Zuordnung zuden Date Nodes werden an den HDFS-Client zurückgeschickt. Dieser übermittelt die Blöcke an einen der Data Nodes. Sobald der erste Data Node einen Block hat, sorgt er dafür die Blöcke an die anderen Data Nodes weiterzuleiten. Die Data Nodes selbst stehen auch in Kontakt zum Name Node und reporten ihren Zustand und die momentan gespeicherten Blöcke. Der Name Node bekommt darüber auch mit, wenn ein Data Node ausfällt.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/hdfs_cluster_architecture.pdf}
+  \caption{HDFS - Datenspeicherung im Verbund (Vgl. \cite{hdfs_architecture},\cite{expert_hadoop_admin})}
+  \label{fig:hdfs_cluster_architecture}
+\end{figure}
+
+\noindent
+Ein Block hat in der Standardkonfiguration 128 MB. Er kann aber auch bis zu 512 MB Größe konfiguriert werden. Dies wirft die Frage auf, ob das HDFS gerade für sehr kleine Dateien, wie sie bei der Analyse von Datenträgern auch vorkommen, nicht zu viel Speicher verschwendet. \\
+Hierbei wird der gleiche Block immer in unterschiedlichen Data Nodes angelegt. Es ist nicht erlaubt den gleichen Block mehrmals im gleichen Data Node zu replizieren. Daher ist die Anzahl der Replikationen auch kleiner gleich der Anzahl Data Nodes im System.
+
+\noindent
+Wichtig hierbei ist auch, dass im Produktivsystem auf jedem physikalischen Knoten auch nur ein DataNode oder ein NameNode läuft. Denn würden beispielsweise mehrere DateNodes auf dem gleichen physikalischen Knoten laufen, so wäre bei einem Ausfall nicht mir garantiert, dass die Dateiinhalte auch noch auf mindestens zweie anderen Knoten laufen. Denn der Replikationsmechanismus im HDFS kann nicht erkennen, ob jeder Knoten physikalisch unabhängig arbeitet. Allerdings hat Hadoop eine sogenannte \textit{Rack-Awareness}. So ist es möglich zu bestimmen, welche physikalischen Server in einem gemeinsamen Rack laufen. Abhängig davon, versucht das HDFS die Daten teilweise im selben Rack redundant zu speichern aber auch einige Replikationen außerhalb des Racks anzulegen. So kann auch der Ausfall eines Racks im Notfall kompensiert werden.\\
+In Testumgebungen ist aber schön möglich sogar NameNode und mehrere DateNodes auf einem Knoten laufen zu lassen. Allerdings greifen die Mechanismen für eine Toleranz gegenüber Hardwareausfällen dann nicht mehr.\\
+
+\noindent
+Wie oben ersichtlich, ist der Name Node die Schlüsselstelle im HDFS-Cluster. Dieser bildet einen \textit{Single Point of Failure}. Denn bei einem Ausfall wäre das HDFS nicht mehr einsatzbereit. Es existiert ein sogenannter \textit{Secondary Name Node}. Dieser erhält die Metainformationen und erstellt daraus regelmäßig Checkpoints. Der Name Node hält die Metainformationen im Arbeitsspeicher. Es existiert aber auch eine Datei \textit{FsImage} und ein \textit{EditLog}, welche persistent auf der Festplatte gespeichert sind. Das FsImage selbst beschreibt einen Zustand der Dateisystemmetainformationen zu einem gewissen Zeitpunkt. Im EditLog befinden sich alle Änderungen seit dem letzten Checkpoint bis zum aktuellen Zeitpunkt. Der Secondary Name Node erstellt aus dem FsImage und dem EditLog regelmäßig neue Checkpoints, die dann der produktive Name Node bei einem möglichen Neustart wiederverwenden kann. Der \textit{Secondary Name Node} unterstützt also den (First) Name Node, er kann ihn aber nicht ersetzen.\\
+Daher ist es möglich auch einen sogenannten \textit{Standby Name Node} zu konfigurieren. Dieser kann einspringen, sobald der erste Name Node ausgefallen ist. Allerdings muss dieser extra konfiguriert werden. Dafür kann aber dann der Secondary Name Node deaktiviert werden.\cite[S. 88]{expert_hadoop_admin}\textbf{ TODO: prüfen ob das wirklich stimmt!}\\
+
+\noindent
+Das HDFS selbst kann über mehrere Wege genutzt werden. Es gibt eine Kommandozeilenschnittstelle, die sogenannte \textit{FS Shell}. Es ist möglich über eine Java oder C++ - Schnittstelle Datenzugriff zu erhalten. Oder das Dateissystem kann über eine REST-Schnittstelle via HTTP(S) genutzt werden. Auch das Mounten als \textit{Network File System (NFS)} ist möglich?
+
+\section{Hadoop YARN}
+
+YARN ist ein Ressourcenmanager, welcher die verfügbaren Ressourcen innerhalb des Hadoop Clusters organisiert und die Ausführungsreihenfolge von Jobs plant und überwacht. Es gibt einen \textit{Resource Manager}, welcher nur die Ressourcen verwaltet. Auf jedem Knoten, welcher auch Datenverarbeitungen durchführt, ist ein \textit{Node Manager} aktiv. Zuletzt gibt es noch einen \textit{Application Manager} für jeden einzelnen Job, der ausgeführt werden soll. Der Application Manager kontrolliert die Ausführung des Jobs.\\
+Abbildung \ref{fig:yarn_cluster_architecture} zeigt die Komponenten von YARN im Cluster.\\
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/yarn_cluster_architecture.pdf}
+  \caption{Ressourcenverteilung mit YARN (Vgl. \cite{yarn_architecture},\cite{expert_hadoop_admin})}
+  \label{fig:yarn_cluster_architecture}
+\end{figure}
+
+\noindent
+Ein Job oder eine Anwendung besteht aus mehreren Tasks. Diese Tasks können parallel in mehreren sogenannten Container ausgeführt werden. Ein Container ist eine abstrakte parallele Verarbeitungseinheit, welche bestimmte CPU- und Speicher-Ressourcen enthält. Es können mehrere dieser Container auf einem Knoten innerhalb des Clusters ausgeführt werden. Beispielsweise werden bei einem Knoten mit einer Quad-Core CPU und Hyperthreading (mit insgesamt 8 ausführbaren Threads) bis zu 8 Container erstellt. Bei 32 GB Arbeitsspeicher könnten dann jedem Container 4 GB zugeteilt werden.\footnote{In der Praxis ist es meistens weniger, da entsprechende Ressourcen für das darunter liegende Betriebssystem und YARN selbst reserviert werden.}\\
+Derzeit werden für den Container die Anzahl der CPU-Cores (Ausführbare CPU-Threads) und die Größe des nutzbaren Arbeitsspeichers definiert.\cite[S. 48 ff.]{expert_hadoop_admin}\\
+
+\noindent
+Wenn nun eine Anwendung über YARN im Cluster ausgeführt werden, soll dann sendet anfragenden Client eine Anfrage an den Resourcen Manager. 
+Für jeden auszuführenden Job erstellt der Resource Manager den ersten Container. In diesem Container wird dann der Application Manager gestartet, welcher sich dann im weiteren Verlauf um die Ausführung des Jobs kümmert. Der Resource Manager selbst kennt die Anwendung nicht, noch weiß er wie diese ausgeführt werden. 
+Er ist nur dafür zuständig Resourcen zu verteilen.\\ 
+Der Application Master hingegen ist sehr spezifisch. Wird zum Beispiel eine Apache Spark Anwendung mit YARN ausgeführt, so ist der Application Master der sogenannte \textit{Spark App Master}. Nachdem nun der Application Master mit im ersten erzeugten Container gestartet wurde, kann dieser wiederum neue Ressourcen beim Resource Manager anfordern. An dieser Stelle zeigt sich der Vorteil von YARN in Kombination mit dem HDFS. Denn bei der Anforderung von Ressourcen gibt der Application Manager an, wieviele Container (inklusive Arbeitsspeicher und CPU) er benötigt. Zusätzlich übermittelt er die Dateiblöcke, welche er aus dem HDFS braucht und an welchen Knoten er welche Container gerne starten würde. So würde der Application Manager 1 auf dem Knoten 2 (siehe Abbildung \ref{fig:yarn_cluster_architecture}) einen Container auf dem Knoten 2 und zwei Container auf dem Knoten 4 mit beispielsweiser 1 GB Arbeitsspeicher und 1 Core anfordern. Denn der Application Master weiß, dass dort die benötigten Datenblöcke im HDFS gespeichert sind. Hierbei ist es wichtig zu verstehen, dass die Knoten aus Abbildung \ref{fig:yarn_cluster_architecture} den Data Nodes aus Abbildung \ref{fig:hdfs_cluster_architecture} entsprechen.\footnote{Wobei ein physikalischer Knoten, auf welchem ein Data Node läuft nicht zwingend auch für die Datenverarbeitung mit YARN verwendet werden muss. Beziehend auf das Paradigma der Datenlokalität ist dies aber der Normalfall, dass ein Knoten, welcher Daten persistiert, auch Daten verarbeiten wird.}\\
+
+\noindent
+Der Application Master erhält dann, die Zustimmung von Resoure Manager, nachdem Scheduler die geforderten Resourcen entsprechend eingeteilt hat. Darauf fordert der Application Manager den Node Manager auf den jeweiligen Knoten auf, entsprechende Container zu erstellen.\\
+Die einzelnen Node Manager stehen in Kontakt zum Resource Manager und reporten ihm, den aktuellen Status des Knoten und dessen Auslastung. \\
+Nach der Ausführung der einzelnen Tasks innerhalb den Container und dem Abschluss des Jobs, schickt der Application Manager die Ergebnisse direkt zurück zum Client.\footnote{Hierbei werden die fachlichen Ergebnisse, meistens als Datei im HDFS gespeichert.}. Danach meldet er sich beim Resource Manager ab. Zuletzt kümmert sich der Resource Manager dann über das Freigeben von allokierten Resourcen.\\
+
+\noindent
+Ähnlich wie beim Prozessschedulung in ein herkömmlichen Betriebssystem, gibt es auch für YARN unterschiedlicher Algorithmen, die festlegen, in welcher Reihenfolge und Zeitdauer die einzelnen Jobs ausgeführt werden. Bekannte Scheduler sind der \textit{Fair Scheduler} und der \textit{Capacity Scheduler}. Abhängig von der genutzten Plattform/Distribution einzelner Hersteller ist für YARN ein anderer Scheduler konfiguriert. In etlichen Fällen wird der Capacity Scheduler als Standard konfiguriert, da dieser versucht alle Knoten möglichst effizient auszusteuern um den höchstmöglichen Datendurchsatz durch erreichen. Der Fair-Scheduler prüft hingegen, dass jedem Job die gleichen Ressourcen zugeteilt werden, um möglichst alle Jobs parallel bedienen zu können.\textbf{TODO: Scheduling prüfen!}
+
+\noindent
+In großen Clustern wird die Prozessierung in mehrere Sub-Cluster mit eigenen Resource Managern aufgeteilt. Diese Struktur findet sich in der Literatur unter \textit{Federaded YARN} und soll die Skalierbarkeit von YARN in großen Clustern ermöglichen.
+
+\section{Apache Spark}
+
+\section{Datenspeicherung in Datenbanken}

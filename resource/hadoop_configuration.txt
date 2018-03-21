@@ -1,0 +1,32 @@
+#Following code works for Fedora 27
+
+#Create a new Hadoop user
+sudo groupadd hadoop
+sudo adduser -g hadoop hduser
+
+#Change account
+#get root
+sudo -i 
+#change to hduser without setting any password for hduser
+sudo -l hduser 
+
+#Create a ssh access without passwort!
+
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 0600 ~/.ssh/authorized_keys
+
+#Store initial fingerprint
+ssh localhost
+
+
+#Unzip latest hadoop version (3.0.0)
+
+#Change owner to hduser
+sudo chown hduser:hadoop -R hadoop-3.0.0
+
+#Configure 
+
+
+#Start HDFS
+./sbin/start-dfs.sh

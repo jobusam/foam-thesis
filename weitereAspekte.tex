@@ -1,0 +1,20 @@
+\section{Forensische Anforderungen}
+
+\subsection{Plattform absichern}
+Ursprünglich spielt das Thema der Datensicherheit bei Apache Hadoop keine Rolle und gewann erst nach und nach an Relevanz. Anfänglich wurde immer angenommen, dass das Hadoop-Clusters aus vertrauenswürdigen Maschinen besteht, welche von vertrauenswürdigen Nutzern in abgesicherten Umgebungen verwendet wird\footnote{Vgl. \url{https://www.infoq.com/articles/HadoopSecurityModel}.}. Mittlerweile hat sich der Bedarf nach Sicherheit deutlich erhöht, da oftmals rießige vertrauliche Datensätze verarbeitet werden, welche bei Angriffen sehr schnell abfließen könnten.\\
+
+\noindent
+Todo:
+Das Absichern des Hadoop-Clusters bezieht sich primär auf die Nutzung von Kerberos zur Authentifizierung.Es gibt etliche weitere Projekte, wie beispielsweise Apache Ranger, Apache Atlas und Apache Knox.Sie alle adressieren einen bestimmten Aspekt zur Verbesserung der Systemsicherheit. Allerdings werde ich mich hauptsächlich auf den Einsatz von Kerberos beschränken und prüfen, welche Vorteile diese Lösung bietet und welche Probleme dabei auftauchen können. Darüber hinaus ist es meines Wissens auch möglich, die Daten auf logischer Ebene zu verschlüsseln (im verteilten Dateisystem HDFS). Dies würde einen unbefugten physischen Zugriff erschweren. Diesen Punkt werde ich für die Thesis als optionales Arbeitspaket im Hinterkopf behalten. Wahrscheinlich werde ich mit den anderen Themen aber schon genügend Arbeit haben. 
+\subsubsection{Authentifizierung}
+Standardmäßig wird Hadoop in Kombination mit Kerberos verwendet, um eine allgemeinen Zugriffsschutz zu ermöglichen.\cite{hadoop_security}\\
+Eine Alternative könnte hier auch Cloudera Sentry, Apache Ranger, Apache Atlas oder Apache Knox\footnote{https://knox.apache.org/} sein.
+\subsubsection{Datenverschlüsselung}
+Prinzipiell lässt sich die Datenverschüsselung in die Szenarien \textit{Persistenzverschlüsselung} und \textit{Transportverschlüsselung} unterteilen. Das HDFS bietet eine Verschlüsselung an, wobei die Komplexität bei Key-Management liegt. Denn schließlich kann ein Hadoop-Cluster mehrere hundert Knoten mit jeweils mehreren Datenträger enthalten. Sie alle müssten eigene Verschlüsselungschlüssel nutzen. Die Verschlüsselung selbst kann direkt auf Betriebsyssystemebene beispielsweise auf LUKS aufbauen, oder sie findet auf logischer Ebene im HDFS statt.\cite{hadoop_security}\\
+
+\noindent
+Darüber hinaus ist die Transportverschlüsselung auch möglich. So müssen die einzelnen Services wie Webzugriffe  mit TLS verschlüsselt werden.\footnote{Weiter Infos unter: \url{https://www.infoq.com/articles/HadoopSecurityModel} und\\ \url{https://community.hortonworks.com/articles/102957/hadoop-security-concepts.html}.}\\
+
+
+\noindent
+Letztlich stellt sich die Frage, welche Angriffe den mit Datenverschüsselung vermieden werden sollen. 

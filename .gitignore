@@ -1,0 +1,27 @@
+# folders with logos
+logos/
+
+# Log file
+*.log
+
+#Latex temp files
+main.aux
+main.bbl
+main.bcf
+main.blg
+main.lof
+main.lol
+main.lot
+main.out
+main.run.xml
+main.synctex.gz
+main.toc
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
