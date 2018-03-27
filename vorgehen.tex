@@ -46,10 +46,46 @@ Das letzte Arbeitspaket enthält ein prototypische Visualisierung der Analyseerg
 \clearpage
 \section{Entwicklungsumgebung}
 \label{development_environment}
-Der Aufbau eine Test- und Entwicklungsumgebung ist ein essentieller Bestandteil dieser Thesis. Einerseits sollen Anwendungsprogramme zur Datenverarbeitung schnell und lokal ausführbar sein und andererseits, soll die Testumgebung auf einem physikalisches Apache Hadoop Cluster laufen, um mögliche Infrastrukturproblem identifizieren zu können. \\
+Der Aufbau eine Test- und Entwicklungsumgebung ist ein wichtiger Bestandteil dieser Thesis. Einerseits sollen Anwendungsprogramme zur Datenverarbeitung schnell und lokal ausführbar sein. Andererseits soll die Testumgebung auf einem physikalischem Apache Hadoop Cluster basieren, um mögliche Infrastrukturprobleme identifizieren zu können und die Performanz zu testen. \\
 
 \noindent
-Alle selbst erstellten Anwendungsprogramme, Konfigurationsdateien und die Dokumentation dieser Thesis sollen als Open Source - Quelle in einem öffentlichen Repository zugänglich sein. Aus fachlicher Sicht ist es gerade in der Forensik sehr wichtig, dem Nutzer die Möglichkeit zu geben, den Quellcode der Analyseprogramme einsehen zu können und in notfalls auf spezielle Bedürfnisse anzupassen. Darüber hinaus kann die Datenverarbeitung transparent nachvollzogen werden.\\
+Abbildung \ref{fig:development_environment} skizziert die Komponenten der Entwicklungsumgebung. Zentraler Bestandteil ist ein Entwicklungsrechner mit der Linux-Distribution \textit{Fedora} in der Version 27 64-bit.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/development_environment.pdf}
+  \caption{Komponenten der Entwicklungsumgebung}
+  \label{fig:development_environment}
+\end{figure} 
 
 \noindent
-Aus diesem Grund soll sämtlicher Source-Code unter der Apache License vertrieben werden. Es soll jedem möglich sein, die Dateien einzusehen. Darüber hinaus wird das Projekt vorerst unter GitHub gehostet.
+Zur Entwicklung der forensischen Analyseprogramme wird \textit{Eclipse Oxygen} genutzt. Die Anwendungen selbst werden in Java geschrieben.\footnote{Wobei auch Python oder Scala als Programmiersprache genutzt werden kann.} Zum Bauen der ausführbaren Java-Archive (JAR-Dateien) wird \textit{Maven} verwendet. Mit Maven können weitere Java-Bibliotheken 
+in eigenen Programmen auf einfache Weise wiederverwendet werden.\footnote{Diese können über ein zentrales Repository, dem sogenannten \textit{Maven Central Repository} aus dem Internet geladen werden (siehe \url{https://search.maven.org/}).}\\
+Um die gebauten Java-Programme zur Datenanalyse schnell testen zu können, kann auf dem lokalen Entwicklungsrechner eine Apache Spark Standalone Instanz gestartet werden. Diese dient ausschließlich zur simplen Ausführung von Spark-Applikationen. Hierbei arbeitet die Instanz direkt auf dem lokalen Dateisystem und nutzt kein HDFS. Darüber hinaus wird nicht YARN, sondern ein bei Apache Spark mitgelieferter Ressourcenmanager genutzt.\footnote{Siehe Kapitel \ref{ch:theory_hadoop} für eine detaillierte Erklärung von Apache Hadoop.}\\
+
+\noindent
+Analog zur Spark Standalone Instanz kann auch ein Hadoop Pseudo-Distributed Single Node auf dem lokalen Rechner gestartet werden.\footnote{Hierfür muss der Entwicklungsrechner entsprechende Ressourcen bereitstellen. Es sollten mindestens eine Quad-Core-CPU, 16 GB Arbeitsspeicher und eine SSD zur Verfügung stehen, um halbwegs performant arbeiten zu können.} Mithilfe diese Single-Nodes können spezifische Konfiguration des HDFS oder des Ressourcenmanagers YARN ausprobiert werden.\\
+Letztendlich kommen diese lokale Hadoop und Spark Instanzen aber schnell an ihre Grenzen. Daher werden spezifische Konfigurationen und fertiggestellte Analyseprogramme auch auf einem realen
+Apache Hadoop Test-Cluster durchgeführt. Dort kann das Zusammenspiel zwischen Hadoop und Spark nachvollzogen werden. Auch entsprechende Last- und Performance-Tests sind nur auf dem Hadoop Test-Cluster sinnvoll.\\
+Um mit dem Test-Cluster arbeiten zu können, wird ein SSH-Client benötigt. Zusätzliche gibt es auch eine Web-Oberfläche basierend auf Apache Ambari zur Konfiguration und Anzeige des aktuellen Systemzustandes.\\
+
+\noindent
+Alle selbst erstellten Anwendungsprogramme, Konfigurationsdateien und die Dokumentation dieser Thesis sollen als Open-Source Projekte in einem öffentlichen Repository zugänglich sein. Aus fachlicher Sicht ist es gerade in der Forensik sehr wichtig dem Nutzer die Möglichkeit zu geben, den Quellcode der Analyseprogramme einsehen zu können und notfalls auf spezielle Bedürfnisse anzupassen. Darüber hinaus kann die Datenverarbeitung transparent nachvollzogen werden.
+Daher werden die einzelne Projekte mithilfe eines Git-Clients auf GitHub versioniert.\\
+Nachfolgende Auflistung zeigt die Aufteilung der Projekte:
+\begin{itemize}
+\item Das Projekt \textit{foam-thesis}\footnote{Die Abkürzung \textit{foam} oder auch \textit{foAm} steht für \textit{\textbf{fo}rensische \textbf{A}nalyseplattfor\textbf{m}}} enthält die schriftliche Ausarbeitung der Thesis und den Quellcode als Latex-Projekt. Als Entwicklungsumgebung wird \textit{Texmaker} genutzt.\\
+Über den Link \url{https://github.com/jobusam/foam-thesis} ist der aktuelle Stand der Arbeit jederzeit einsehbar.\footnote{Das kompilierte PDF-Dokument zum jeweiligen Stand wird im gleichen Projekt versioniert und ist unter dem Link \url{https://github.com/jobusam/foam-thesis/blob/master/main.pdf} verfügbar.}
+
+\item Das Projekt \textit{foam-processing-spark} enthält den Quellcode zur Auswertung mit Apache Spark\texttrademark\thinspace. Unter \url{https://github.com/jobusam/foam-processing-spark} befindet sich ein Maven-Projekt, welches wiederum die Java-Anwendung baut. Es werden auch entsprechende Skripte zum Starten von Spark-Anwendungen auf dem lokalen Rechner bereitgestellt. 
+\end{itemize}
+
+\noindent
+Derzeit ist die Lizenzierung beider Projekte noch nicht klar. Sehr wahrscheinlich wird die Thesis-Dokumentation unter der \textit{GNU Free Documentation License (GFDL)} lizenziert, wohingegen der restliche Quellcode unter der \textit{GNU Affero General Public License Version 3 (AGPLv3)} oder alternativ unter der Apache License 2.0 veröffentlicht werden soll. Es soll jedem möglich sein, den Quellcode einzusehen und nach belieben ändern zu können.\\
+
+\noindent
+Aus organisatorischen Gründen, wird darauf geachtet, dass während der Ausarbeitungszeit der Thesis nur Änderung von dem Autor selbst in dem entsprechenden Repository gehostet werden.\\
+
+\section{Testdatengenerierung}
+\label{testdatacreation}
+Für den Aufbau einer forensischen Analyseplattform sollen entsprechende Testdaten generiert werden. \\
