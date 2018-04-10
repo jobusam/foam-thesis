@@ -78,6 +78,9 @@ Nachfolgende Auflistung zeigt die Aufteilung der Projekte:
 Über den Link \url{https://github.com/jobusam/foam-thesis} ist der aktuelle Stand der Arbeit jederzeit einsehbar.\footnote{Das kompilierte PDF-Dokument zum jeweiligen Stand wird im gleichen Projekt versioniert und ist unter dem Link \url{https://github.com/jobusam/foam-thesis/blob/master/main.pdf} verfügbar.}
 
 \item Das Projekt \textit{foam-processing-spark} enthält den Quellcode zur Auswertung mit Apache Spark\texttrademark\thinspace. Unter \url{https://github.com/jobusam/foam-processing-spark} befindet sich ein Maven-Projekt, welches wiederum die Java-Anwendung baut. Es werden auch entsprechende Skripte zum Starten von Spark-Anwendungen auf dem lokalen Rechner bereitgestellt. 
+
+
+\item Das Projekt \textit{foam-storage-hadoop} enthält alle Konfigurationsdateien zum Aufsetzten eines Hadoop-Cluster auf einem einzelnem Knoten im \textit{Pseudo-Distributed Mode}.\footnote{Siehe \url{https://github.com/jobusam/foam-storage-hadoop/tree/master/hadoop.standalone.configuration}} Zusätzlich existieren Shell-Skripte zum Starten des Hadoop-Clusters auf einem einzelnen Knoten.\footnote{Siehe \url{https://github.com/jobusam/foam-storage-hadoop/tree/master/hadoop.standalone.setup}} Das Hadoop-Cluster besteht nur aus dem HDFS und dem Resourcenmanager YARN. Mithilfe der Skripte aus dem \textit{foam-processing-spark} Projekt können damit Spark-Anwendungen auf einem lokalen Knoten innerhalb eines HDFS mit YARN ausgeführt werden.
 \end{itemize}
 
 \noindent
@@ -88,4 +91,10 @@ Aus organisatorischen Gründen, wird darauf geachtet, dass während der Ausarbei
 
 \section{Testdatengenerierung}
 \label{testdatacreation}
-Für den Aufbau einer forensischen Analyseplattform sollen entsprechende Testdaten generiert werden. \\
+\textbf{TODO: Kapitel überarbeiten...}
+Für den Aufbau einer forensischen Analyseplattform sollen entsprechende Testdaten generiert werden. Hierbei gibt es zwei unterschiedliche Falldaten. Der erste Fall wäre ein kleines Image kleiner 10 GB. Dieses Image könnte für lokale Tests genutzt werden.\\
+Im zweiten Fall müssen größere Images erzeugt werden, um ein passendes Szenario für das Hadoop Test-Cluster zu erzeugen. Der zweite Fall könnte 2 PCs und ein Server enthalten. Die Images der PCs sollten mindestens 100 GB groß sein, wohin gegen der Server 250 GB groß sein könnte. Ein zusätzlicher USB-Stick mit 64 GB Daten könnte auch dazu passen. Die Images dieser PCs und des Servers könnten virtualisiert erstellt werden. Folgende Applikationen könnten genutzt werden: Thunderbird, Firefox, Owncload, Apache HTTP Server. Es soll herausgefunden werden, wann welche Daten zwischen den drei Rechnern ausgetauscht wurden.\\
+
+\noindent
+Für lokale Tests und den Aufbau der Plattform bietet sich beispielsweise auch das Testscenario \textit{Data Leakage Case} an, welches auf der Website \textit{Computer Forensic Reference Data Sets} verfügbar ist.\footnote{Siehe \url{https://www.cfreds.nist.gov/data_leakage_case/data-leakage-case.html},\\ letzter Stand 28.3.2018.} \\
+Diese Images könnten auf verdächtige Querverweise untersucht werden.
