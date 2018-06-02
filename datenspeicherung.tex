@@ -86,5 +86,61 @@ TODO: weiterer Aspekt - performantes Prozessieren von vielen kleinen Dateien / b
 Metadaten,Blockaufteilung,logische Sicherung\\
 nachteil, carving muss vorher passieren...
 
-\subsubsection{Variante 5 - HBASE + HDFS}
-Diese Variante beschreibt einen Ansatz, bei welchem die Metadaten und sehr kleine Dateien direkt in HBASE persistiert werden. Dateien größer XX MB werden direkt im HDFS abgelegt und im jeweiligen Dateieintrag in HBASE verlinkt. Auch hier müsste beim Import der Daten eine eigene Anwendung die Informationen aus dem Datenträgerabbild auslesen und entsprechend ihrer Struktur in HBASE und HDFS speichern.
+\subsubsection{Variante 5 - Speicherung mit HBASE und HDFS}
+Diese Variante beschreibt einen Ansatz, bei welchem die Metadaten und sehr kleine Dateien direkt in HBASE persistiert werden. Dateien größer 10 MB werden direkt im HDFS abgelegt und im jeweiligen Dateieintrag in HBASE verlinkt. Auch hier muss beim Import der Daten eine eigene Anwendung die Informationen aus dem Datenträgerabbild auslesen und entsprechend ihrer Struktur in HBASE und HDFS speichern. Das GitHub-Projekt \textit{foam-data-import} enthält diese Anwendung (siehe \url{https://github.com/jobusam/foam-data-import}).\\
+
+%\noindent
+%TODO: Siehe HBASE MOB (Medium-sized Object Binaries)
+
+\section{Fachliche Probleme bei den Daten}
+
+\subsection{Symbolische Links}
+Es gibt einige Hürden beim Importieren der Datenträger in das HDFS. Wie bereits erwähnt werden die Daten auf logischer Dateiebene in das Hadoop-System importiert. Hierbei müssen spezielle Dateitypen berücksichtigt werden. Ein Beispiel ist die Verarbeitung von symbolischen Links, welche gerade unter Linux-basierten Betriebssystemen beziehungsweise in der EXT-Dateisystemfamilie auftreten können. Denn wenn symbolische Links in einem Dateisystem gespeichert werden und letzteres im Analysesystem gemountet wird, so können diese Links auch auf Dateien außerhalb des Dateisystems verweisen. Denn letztlich interpretiert das Betriebssystem diese symbolischen Links. Bei der forensischen Analyse könnte diese aber zu schwerwiegenden Fehlern der Analyseergebnisse führen, wenn beispielsweise Inhalte des Analyserechners verarbeitet werden, welche ursprünglich nicht auf dem Asservat vorhanden waren. Daher muss beim Import auf geprüft werden, ob die Datei einem symbolischen Link entspricht. Ist dies der Fall darf, der symbolische Link nicht interpretiert werden. 
+
+\subsection{Zugriffsrechte}
+Ein weiterer Aspekt ist die Beschränkung der Dateizugriffe auf Basis der vorgegebenen Zugriffsrechte. Angenommen es wird ein Datenträgerabbild auf einem Analysesystem gemountet.
+Dann kann dies im Normalfall nur mit Root-Rechten durchgeführt werden. 
+Der forensische Analyse benötigt also zumindest auf seinem Analyse-Rechner 
+privilegierte Ausführungsrechte.\\
+Beim Import von Dateien auf eben diesem gemounteten Dateisystem des Datenträgerabbildes sind jedoch die Dateizugriffsrechte weitaus interessanter. Denn das Analyse-Betriebssystem berücksichtigt diese Zugriffsrechte. Während diese Problematik beispielsweise bei NTFS-Dateisystemen eine untergeordnete Rolle spielt, so werden hingegen bei EXT-Dateisystemen die Unix-Dateirechte gespeichert und auch auf dem Analysesystem interpretiert. 
+Daher kann der Nutzer und dessen ausgeführte Programme, welche die Daten aus dem Dateisystem auslesen, nicht in allen Fällen auf alle Dateien zugreifen.\\
+
+\noindent
+Die einfachste Möglichkeit um die Problematik der Zugriffsrechte zu umgehen, wäre das Ausführen der Datenimport-Applikation mit Root-Rechten. Andererseits sollte die Datenimport-Applikation aber nicht mit Root-Rechten ausgestattet werden, da dies zu Sicherheitslücken und unvorhergesehenen Rechteausweitungen im Fehlerfall führen könnte. Darüber hinaus kann bei einem Fehlverhalten der Anwendung das Analysesystem beschädigt werden. \\
+Letztlich braucht die Anwendung zum Datenimport nur die Berechtigungen zum Lesen von Dateien mit Root-Rechten. Dies würde dem \textit{Need-to-know-Prinzip} genügen.\\
+%(TODO: verweis auf s. 42 M106)
+
+\noindent
+Eigentlich müsste beim Mounten des Dateisystems dem Betriebssystem mitgeteilt werden können, dass die Dateirechte des gemounteten Dateisystems ignoriert werden sollen. Diese Option ist aber nicht möglich\footnote{Zumindest konnte keine funktionierende Variante gefunden werden (siehe Man-Page des Mount-Befehls.}.\\
+Eine weitere Alternative wäre die Möglichkeit mit Access Control Lists (ACL) zu arbeiten und dem nichtprivilegiertem Nutzer Rechte zum Lesen der Dateien zu geben. Oder umgekehrt alle Dateien dem nichtprivilegierten Nutzer zuzordnen, welcher wiederum den Datenimport startet.
+Hierzu müsste die Datenträgerkopie schreibend gemountet werden, damit die Rechte jeder Datei angepasst werden können. Dies würde wiederum dazu führen, dass das Datenträgerabbild als sichergestelltes Asservat geändert werden würde. 
+Daher ist diese Lösung auch nicht geeignet.\\
+
+\noindent
+Eine weitere Alternative ist die Nutzung von Posix Capabilities\footnote{Siehe Manpages mit folgendem Befehl: \textit{ man 7 capabilities}.}.
+Dies scheint unter CentOS/Fedora wohl die beste Variante zu sein. Zum Lesenden Zugriff auf Dateien müsste die Posix Capability \textit{CAP\_DAC\_READ\_SEARCH} gesetzt werden.\\
+Mit nachfolgenden Kommando könnte diese Capability dem Analyseprogramm gesetzt werden.
+Damit könnte dann auch ein nicht-privilegierte Nutzer lesenden Zugriff auf privilegierte Dateien erhalten.\\ 
+
+\begin{lstlisting}[label={lst:pos_cap_command},caption= Befehl zum Setzen von Posix Capabilities,captionpos=b,frame=single,style=customshell]
+setcap CAP_DAC_READ_SEARCH /bin/forensic_import
+\end{lstlisting}
+% Mit oder ohne + eip???
+%setcap CAP\_DAC\_READ\_SEARCH+eip /bin/ping
+
+\noindent
+Allerdings funktioniert diese Art hauptsächlich bei Binärprogrammen aber nicht bei Shell-Skripten oder Java-Anwendungen. Ein ähnliche Alternative zu Posix Capabilities ist das Setzen des SUID-Bits als Unix-Dateirecht für die Programmdatei. Aber auch gilt wieder, dass dies für Binärprogramme funktioniert aber nicht für interpretierte Skripte oder Java-Anwendungen, welche wiederum in der Java Virtual Machine laufen.
+%Setzen des Flags
+%chmod u-s /bin/ping
+
+Die Nutzung von SELINUX empfiehlt sich hier auch nicht. SELINUX ist eine Erweiterung des Linux-Kernels um detaillierte Zugriffskontrollen zu setzen. Diese Erweiterung ermöglicht eine detaillierte Definition, welche Anwendung oder Nutzer auf einzelne Dateien zugreifen dürfen. Allerdings werden auch unter SELINUX immer zuerst die Unix-Dateirechte und zusätzlich die in SELINUX definierten Zugriffskontrollen geprüft. Daher kann auch mit SELINUX das Problem nicht behoben werden.\\
+
+\noindent
+Zuletzt gibt es noch eine Variante, welche die Problematik mit den Dateirechten lösen kann. 
+Mit dem Projekt \textit{bindfs}\footnote{Siehe \url{https://bindfs.org/}.} können unter Linux Dateisystemverzeichnisse neu gemountet werden und ihre Zugriffsrechte verändert werden. Der nachfolgende Befehl mountet das existierende Verzeichnis mit den enthaltenden Dateien in einem neuen Verzeichnis und setzt beispielsweise bei jeder Datei die aktuelle ID des Nutzers als Datei-Owner und Group. 
+\begin{lstlisting}[label={lst:bindfs_command},caption= Nutzung von Bindfs zum Ändern von Dateirechten,captionpos=b,frame=single,style=customshell]
+sudo bindfs -u $(id -u) -g $(id -g) src_dir/ target_dir/
+\end{lstlisting}
+Der Befehl selbst benötigt Root-Rechte. Jedoch kann der Nutzer danach alle Dateien des Zielverzeichnisses lesen. Der einzige Nachteil an dieser Lösung ist, dass der Besitzer und die Gruppe jeder einzelnen Datei nun der Nutzer des Analysesystems ist.\\
+Dieser Nachteil muss zukünftig behoben werden, damit die forensische Analyseplattform auch die Besitzer und Gruppen einer Datei korrekt auswerten kann.
+%Im Anhang beschreiben, wie bindfs gebaut werden kann.

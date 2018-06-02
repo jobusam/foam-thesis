@@ -1,4 +1,5 @@
 \section{Hadoop\textsuperscript{\textregistered} Framework}
+\label{sec:theory_hadoop}
 \noindent
 Apache Hadoop ist ein etabliertes Java-Framework zur verteilten Speicherung und Verarbeitung von Daten. Durch die parallele Ausführung von Algorithmen eignet sich ein Hadoop-Cluster für rechenaufwendige Datenanalysen. Ein primäres Paradigma ist das Konzept der \textit{Datenlokalität}. Die auszuführenden Programme werden auf die Knoten verteilt, auf welchen auch die Daten liegen. Ressourcenintensive Datentransporte sollen weitgehend vermieden werden.\cite[S. 20 ff.]{big_data_praxis}\\ 
 Das Framework ist für die Ausführung auf Standardhardware konzeptioniert. Es wird also keine verhältnismäßig teure Spezialhardware benötigt. Das Cluster besteht aus vielen einzelnen Knoten mit Standardhardware, welche im Verhältnis zu Spezialhardware günstiger und leicht ersetzbar ist. Der Ausfall einzelner Knoten ist die Regel und wird bei der Datenhaltung entsprechend berücksichtigt. \\
@@ -46,6 +47,7 @@ Es gibt einige Unternehmen, die sich speziell daruf spezialisiert haben dieses A
 
 
 \section{Hadoop HDFS}
+\label{sec:theory_hdfs}
 Das Hadoop Distributed Filesystem (HDFS) ist ein verteiltes Dateisystem, welches die Grundlage zu Speicherung von Daten im Hadoop-Ökosystem bietet. Nachfolgende Zwecke soll es erfüllen.\\
 Es soll ausfallsicher sein. In der Standardkonfiguration wird jede Datei dreifach auf unterschiedlichen physikalischen Knoten gespeichert. Damit kann selbt bei einem Ausfall von zwei Knoten immer noch auf die Datei zugegriffen werden. Darüber hinaus verteilt das HDFS die Dateien automatisch und regeneriert sich selbst nach Ausfällen von Knoten. In großen Computer-Clustern mit mehreren hunderten Knoten ist ein Ausfall eines Knoten kein Sonderfall sondern die Regel. Daher muss sich das HDFS selbst heilen können, um auch ohne manuelle Administration weiter verfügbar zu sein.\\
 Das HDFS (und auch Hadoop im allgemeinen) soll horizontal skalierbar sein. Wird mehr Speicher benötigt, sollen einfach noch Knoten hinzugefügt werden können.\\
@@ -83,7 +85,7 @@ Daher ist es möglich auch einen sogenannten \textit{Standby Name Node} zu konfi
 Das HDFS selbst kann über mehrere Wege genutzt werden. Es gibt eine Kommandozeilenschnittstelle, die sogenannte \textit{FS Shell}. Es ist möglich über eine Java oder C++ - Schnittstelle Datenzugriff zu erhalten. Oder das Dateissystem kann über eine REST-Schnittstelle via HTTP(S) genutzt werden. Auch das Mounten als \textit{Network File System (NFS)} ist möglich?
 
 \section{Hadoop YARN}
-
+\label{sec:theory_yarn}
 YARN ist ein Ressourcenmanager, welcher die verfügbaren Ressourcen innerhalb des Hadoop Clusters organisiert und die Ausführungsreihenfolge von Jobs plant und überwacht. Es gibt einen \textit{Resource Manager}, welcher nur die Ressourcen verwaltet. Auf jedem Knoten, welcher auch Datenverarbeitungen durchführt, ist ein \textit{Node Manager} aktiv. Zuletzt gibt es noch einen \textit{Application Manager} für jeden einzelnen Job, der ausgeführt werden soll. Der Application Manager kontrolliert die Ausführung des Jobs.\\
 Abbildung \ref{fig:yarn_cluster_architecture} zeigt die Komponenten von YARN im Cluster.\\
 
@@ -113,8 +115,38 @@ Nach der Ausführung der einzelnen Tasks innerhalb den Container und dem Abschlu
 Ähnlich wie beim Prozessschedulung in ein herkömmlichen Betriebssystem, gibt es auch für YARN unterschiedlicher Algorithmen, die festlegen, in welcher Reihenfolge und Zeitdauer die einzelnen Jobs ausgeführt werden. Bekannte Scheduler sind der \textit{Fair Scheduler} und der \textit{Capacity Scheduler}. Abhängig von der genutzten Plattform/Distribution einzelner Hersteller ist für YARN ein anderer Scheduler konfiguriert. In etlichen Fällen wird der Capacity Scheduler als Standard konfiguriert, da dieser versucht alle Knoten möglichst effizient auszusteuern um den höchstmöglichen Datendurchsatz durch erreichen. Der Fair-Scheduler prüft hingegen, dass jedem Job die gleichen Ressourcen zugeteilt werden, um möglichst alle Jobs parallel bedienen zu können.\textbf{TODO: Scheduling prüfen!}
 
 \noindent
-In großen Clustern wird die Prozessierung in mehrere Sub-Cluster mit eigenen Resource Managern aufgeteilt. Diese Struktur findet sich in der Literatur unter \textit{Federaded YARN} und soll die Skalierbarkeit von YARN in großen Clustern ermöglichen.
+In großen Clustern wird die Prozessierung in mehrere Sub-Cluster mit eigenen Resource Managern aufgeteilt. Diese Struktur wird in der Literatur als \textit{Federaded YARN} beschrieben und soll die Skalierbarkeit von YARN in großen Clustern ermöglichen.
 
+\section{Apache HBASE}
+\label{sec:theory_hbase}
+\textit{Apache HBASE\textsuperscript{\textregistered}} ist eine spaltenorientierte \textit{NoSQL}-Datenbank. Sie entstand auf den Grundlagen der \textit{BigTable}-Datenbank von Google und wurde für das Speichern von Daten im Hadoop-Umfeld entwickelt.\footnote{Der Name \textit{HBASE} basiert auf der Kombination von \textit{Hadoop} und \textit{Database}.}\\
+Der Begriff \textit{NoSQL}-Datenbank steht hierbei für \textit{Not only SQL} und beschreibt letztlich Datenbanken, welche Daten vorwiegend nicht in herkömmlichen relationalen Datenbankschemata speichern. Größtenteils sind diese Datenbanken schemafrei und können horizontal skaliert werden. Diese Bedingungen sind optimal zur Speicherung großer unstrukturierter Datenmengen.\\
+Anhand des sogenannten \textit{CAP-Theorems} können diese Datenbanken kategorisiert werden.
+Das CAP-Theorem besteht aus den Eigenschaften Konsistenz, Verfügbarkeit und Partitionstoleranz und besagt, dass maximal zwei dieser drei Eigenschaften von einer Datenbank garantiert werden können. Konsistenz beschreibt hier die Garantie, dass alle Knoten im verteilten System den gleichen Datenstand haben. Die Verfügbarkeit bezieht sich auf die dauerhafte Erreichbarkeit der Daten. Wohingegen die Partitionstoleranz die Funktionsfähigkeit selbst bei Ausfall einzelner Knoten im Datenbank-Verbundsystem garantiert.
+Apache HBASE garantiert hierbei die Eigenschaften der Partitionstoleranz und der Konsistenz. Dies führt dazu, dass die Verfügbarkeit der Daten weniger stark ausgeprägt ist.
+\cite[S. 189 ff.]{big_data_praxis}\\
+
+\noindent
+Während herkömmliche relationale Datenbanken die Daten zeilenweise speichern, werden in spaltentorientierten Datenbanken die Daten spaltenweise gespeichert. Hierbei werden die Daten der einzelnen Spalten gruppiert in sogenannten \textit{Column Families} abgespeichert. Der Vorteil dieser Speicherart hängt stark von deren fachlichen Nutzung ab. Wenn alle Daten einer Spalte abgefragt werden, dann können diese Daten effizienter gelesen werden da sie zusammen persistiert wurden. Bei einer relationalen Datenbank hingegen wird bei solchen Anfragen die ganze Zeile mit allen Feldern gelesen, obwohl nur ein kleiner Teil dieser Daten wirklich benötigt wird.\\
+
+\noindent
+Apache HBASE basiert eben auf dieser Spaltenorientierung. Die Datenbank wird im Rahmen dieser Thesis für das Speichern beliebiger Dateiinhalte und Dateimetadaten verwendet. Die Datenstruktur wird in Abbildung XXX dargestellt. TODO: Abbildung erstellen \\
+
+\noindent
+Anhand der Abbildung werden einige Eigenschaften von HBASE sichtbar. So existieren zwei \textit{Column Families} mit den Namen \textit{metadata} und \textit{content}. Die Column Family \textit{metadata} enthält wiederum die Spalten \textit{relativeFilePath}, \textit{fileType}, \textit{fileType} oder auch \textit{lastModified}. Die Werte werden alle als Binär-Inhalt in die Tabelle geschrieben. Eine Zeile hat dann jeweils einen eindeutigen Spaltenschlüssel, wie zum Beispiel \textit{row0}. Über diesen Schlüssel können die spezifischen Inhalt der einzelnen Spalten erfragt werden. Interessant hierbei ist, dass die Spaltenwerte optional sind und nicht für jede Zeile existieren müssen. Aufgrund der Gruppierung und Speicherung in Column Families benötigen leere Spaltenwerte auch keinen Speicherplatz. Ein einzelne Zelle beschreibt letztlich den Wert einer Spalte für eine konkrete Zeile. Hierbei wird zu jeder Zelle auch ein Zeitstempel gespeichert. Mithilfe diesen Zeitstempels können auch ältere Werte einer Zelle ausgelesen werden. So wird bei einer Modifikation einer konkreten Zelle der Wert inklusive eines neuen Zeitstempels geschrieben. Es ist jedoch immer noch möglich, ältere Zustände der Zelle zu lesen.\\
+
+\noindent
+Die einzelnen Zellen einer Zeile (definiert durch den eindeutigen Zeilenschlüssel)
+werden intern als verkettete Liste gespeichert. Darüber hinaus werden die Zeilen selbst auch als verkettete Liste abgelegt. Aufgrund dieser Struktur ist die Analogie zur einer mehrstufigen \textit{Map}, wie sie aus den meisten Programmiersprachen bekannt ist, einfacher zu verstehen, als die Darstellung mit einer klassischen Tabelle.\\
+
+
+\noindent
+Die Skalierbarkeit und die Partitionstoleranz wurden bei der Entwicklung von HBASE berücksichtigt. Es baut auf dem Hadoop HDFS auf und speichert darin die Daten. Analog zu HDFS, YARN oder Spark existiert auch hierbei eine Master-Slave Archtitektur über alle Knoten hinweg. Die einzelnen Knoten werden bei HBASE \textit{Region Server} genannt und speichern jeweils unterschiedliche Teil der in HBASE angelegten Tabellen. Nachfolgende Abbildung zeigt die physikalische Aufteilung. TODO: Abbildung erstellen.\\
+
+\noindent
+Prinzipiell ist es möglich in einem Cluster nicht auf allen Knoten einen Region-Server auszuführen. Um das Prinzip der Datenlokalität bestmöglich zu unterstützen, macht es jedoch gerade beim Verarbeiten der Daten aus HBASE am ehesten Sinn die Region-Server zumindest auf den Knoten laufen zu lassen, wo beispielsweise die Application Container von YARN beziehungsweise die Worker von Apache Spark laufen. Somit können die Daten direkt auf dem Knoten verarbeitet werden, wo sie auch gespeichert sind und müssen nicht über das Netzwerk an andere Knoten gesendet werden.\footnote{Sie auch Kapitel \ref{sec:theory_yarn} und Kapitel \ref{sec:theory_spark}.}
+
+\noindent
+TODO: Erstellung eines adäquaten Zeilenschlüssels und dessen Auswirkungen (numerische Sortiertung, Hot Spot, ...)
 \section{Apache Spark}
-
-\section{Datenspeicherung in Datenbanken}
+\label{sec:theory_spark}

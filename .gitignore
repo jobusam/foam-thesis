@@ -16,6 +16,7 @@ main.out
 main.run.xml
 main.synctex.gz
 main.toc
+main.dvi
 
 # Package Files #
 *.jar
