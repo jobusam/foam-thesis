@@ -1,4 +1,7 @@
-\section{Datenverarbeitung mit Apache Spark\texttrademark}
+\chapter{Datenverarbeitung}
+\label{ch:data_processing}
+
+\section{Verarbeitung Apache Spark\texttrademark}
 Der physikalische Aufbau wurde bereits im Grundlagenkapitel zu Apach Spark behandelt (siehe Kapitel \ref{sec:theory_spark}). In diesem Kapitel sollen primär die Algorithmen und die Verarbeitung der Daten aus logischer Sicht betrachtet.\\ 
 
 \noindent
@@ -48,3 +51,19 @@ forensicMetadata.collect().stream()
 forensicMetadata.take(10).stream()
 	.forEach(m -> LOGGER.info("Entry = .", m));	
 \end{lstlisting}
+
+
+\section{Anwendungsfälle der Datenverarbeitung}
+\subsection{Hashsummen ermitteln}
+
+\subsection{Dateityp erkennen mit Apache Tika}
+
+\subsection{Dateien indizieren}
+Ein weitere Anwendungsfall ist die Indizierung von Texten und Wörtern, welche aus den einzelnen Dateien extrahiert wurden.\\
+
+\noindent
+Der Grund für eine Indizierung dieser Inhalte ist eine schnellere Suche nach beliebigen Wörtern, als bei der reinen Suche in HBASE. Zur Indizierung existieren zwei bekannte Projekt. Diese sind einerseits \textit{Apache Solr} und andererseits \textit{Elasticsearch}. Bei bauen wiederum auf das \textit{Apache Lucene}-Projekt auf. Apache Solr ist ein Open-Source Projekt unter dem Dach der Apache Foundation. Wohingegen Elasticsearch auch als Open-Source Projekt entwickelt wird, jedoch primär von der kommerziellen Firma \textit{Elastic???} verwaltet wird. Diese bietet gerade Zusatzpakete und Support gegen Bezahlung an.
+\subsubsection{Apache Solr}
+Spark-Connector von Databracks vorhanden. Der Connector selbst bietet aber vorzugsweise lesenden Zugriff.
+\subsubsection{Elasticsearch}
+Spark-Connector auf RDD-Basis vorhanden. Kerberos-Sicherung nur über X-Pack gegen Geld vorhanden. Rack-Awareness und Verteilung nicht klar. Elasticsearch baut eigene Infrastruktur auf. Nicht über Ambari steuerbar.

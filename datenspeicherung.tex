@@ -1,6 +1,16 @@
-\section{Datenspeicherung im HDFS}
+\chapter{Datenspeicherung}
+\label{ch:data_persistence}
 
-\subsection{Traditionelles Analysevorgehen}
+\section{Allgemeines}
+Im Praxisteil dieser Arbeit soll eine Analyse-Plattform auf Basis von Hadoop aufgebaut werden. Um die fachlichen Anforderungen an das Analyse-System herauszuarbeiten, soll das herkömmliche Analysevorgehen betrachtet werden.\\
+Die Ausgangslage liefert beispielsweise ein Testszenario, welches ein Datenträgerabbild eines virtualisierten Linux-PCs enthält. Das Abbild selbst ist 10 GB groß.\\
+
+\noindent
+Dieses Abbild soll als Referenz für die einzelnen Analyse-Schritte gelten. 
+Hierbei sollen in jedem der nachfolgenden Unterkapitel die fachlichen Verarbeitungsschritte auf herkömmlichen Wege mit der hier erstellten Analyse-Plattform verglichen werden.\\
+Ein gängiges Analysevorgehen besteht aus der Speicherung des Abbildes auf dem lokalen Analyse-Rechner und dem Analysieren des Beweismittels mit Betriebssystemprogrammen unter Linux oder mithilfe des Open-Source Analysetools \textit{Autopsy}\footnote{Siehe \url{https://www.sleuthkit.org/autopsy/}. Hierbei wird die Version 4.6.0 in der 64-bit Variante unter Windows 10 Pro genutzt.} unter Windows. Im kommerziellen Bereich existieren noch deutlich mehr Analyse-Tools mit größerem Funktionsumfang. 
+
+\section{Traditionelles Analysevorgehen}
 In einem traditionellen Analysefall wäre als Beweismittel ein Datenträgerabbild des verdächtigen Computers erstellt worden. Mithilfe klassischer Opensource-Tools wie beispielsweise \textit{dd} kann damit zum Beispiel ein Image im RAW-Format erstellt werden. Andere Tools, wie beispielsweise \textit{FTK-Imager} können auch Datenträgerabbilder in speziellen Container-Formaten erstellen und lesen. Beispielsweise gibt es das \textit{EnCase Physical}-Format mit der Dateiendung \textit{e01}, oder das \textit{Advanced Forensic Format} mit der Endung \textit{.aff}.\footnote{Siehe \url{https://support.accessdata.com/hc/en-us/articles/222778608-What-Image-Formats-Do-AccessData-Products-Support-}, Stand: 4.4.2018.}.\\
 
 \noindent
@@ -17,23 +27,40 @@ Im konkreten Testszenario ist das Datenträger-Abbild eines Linux-Rechners im RA
 In der Praxis hat das einfache schreibgeschützte Mounten den Vorteil, dass der Analyst relativ schnell im Dateisystem beliebige Dateien finden und dessen Inhalt mit diversen Tools anzeigen kann. Gerade für eine schnelle Vorprüfung ist dies sinnvoll. Im nachfolgenden Kapitel sollen nun Möglichkeiten zur Speicherung und Aufbereitung des Datenträgerabbildes mithilfe der forensischen Analyse-Plattform untersucht werden.
 
 
-\subsection{Umsetzung in der Hadoop Analyse-Plattform}
+\section{Umsetzung in der Hadoop Analyse-Plattform}
 
-Die Datenspeicherung im HDFS ist wohl der wichtigste Aspekt in dieser Thesis. Hierbei geht es nicht nur darum, wie das HDFS die Daten verwaltet sondern vielmehr um die Art und Weise, wie Daten forensisch korrekt gespeichert werden können.\\
+Die Datenspeicherung im HDFS ist ein wichtiger Aspekt in dieser Thesis. Hierbei geht es nicht nur darum, wie die Daten im Hadoop-Framework verwaltet werden, sondern vielmehr um die Art und Weise, wie Daten forensisch korrekt gespeichert werden können.\\
 
 \noindent
 Der Standardfall wäre hierbei ein Rohdatenträgerabbild (RAW-Image), welches das Beweismittel darstellt. Hierbei liegen die Dateien als fragmentierte Blöcke in einer spezifischen Datenstruktur vor, welche das Dateisystem des Abbildes beschreiben. Je nachdem, ob ein Datenträgerabbild direkt von einer Partition eines Datenträgers oder vom ganzen Datenträger erstellt wurde, sind in dem Abbild unter Umständen auch mehrere Partitionen samt Partiationstabelle enthalten. Von diesen Partition kann wiederum jede einzelne Partition ein eigenes Dateisystem, wie beispiels FAT, ext4, oder NTFS enthalten. Dieses Dateisystem enthält dann die eigentlichen Dateien, welche logisch zusammengesetzt werden müssen.\\ Viele Linux-Distributionen bieten hier bereits eine weitreichende Unterstützung zum Lesen und Schreiben dieser Dateisysteme. Hierzu können die Dateisysteme einzelner Partitionen des Datenträgerabbildes \textit{gemountet} werden.\\
 
 \noindent
-Zur Speicherung der Daten im HDFS gibt es mehrere Möglichkeiten, deren Vor- und Nachteile nachfolgend dargestellt werden.
+Zur Speicherung der Daten im Hadoop-Framwork gibt es mehrere Möglichkeiten, deren Vor- und Nachteile nachfolgend dargestellt werden sollen.
 
-\subsubsection{Variante 1 - Datenträgerabbild im HDFS speichern}
+\subsection{Variante 1 - Datenträgerabbild im HDFS speichern}
 
-Die naheliegende Variante zur Speicherung der Beweismittel, wäre die Datenträgerabbilder direkt im HDFS abzuspeichern. Allein die Größe der Abbilder wäre nicht problematisch. Um eine eine entsprechende Aufteilung kümmert sich das HDFS.\\ Allerdings hat die Lösung den entscheidenden Nachteil, bei der Weiterverarbeitung der Daten. Auf Betriebssystemebene lassen sich solche Datenträger einfach mounten. Zumal die meisten Betriebssysteme auch ein großen Teil der unterschiedlichen Dateisysteme auf einem Datenträger erkennen können. Aber innerhalb des Hadoop-Frameworks findet sich keine Unterstützung zum Lesen von beliebigen Dateisystemen. Denn normalerweise nutzen JAVA-Applikationen ein definierte Schnittstelle auf Basis logischer Dateien, die wiederum vom Betriebssystem bereitgestellt werden. Um die logischen Dateien aus dem Datenträgerabbild extrahieren zu können, müsste für jedes einzelnes Dateisystem eine eigene Implementierung geschrieben werden.\\ 
-Darüber hinaus wäre das Extrahieren der Dateien aus einem Dateisystem auf einem Datenträgerabbild auch nicht wirklich performant. Angenommen das Auslesen würde mit Apache Spark durchgeführt werden. Aufgrund der eingangs beschriebenen Datenlokalität (siehe Kapitel \ref{ch:theory_hadoop}) wären auf jedem Knoten einzelne Blöcke von beispielsweise 128 MB Größe vorhanden. Um dann im ext4 Dateisystem eine Datei lesen zu können, sollten zumindest die Dateisystemmetadaten aus dem 1. Block in jedem Knoten verfügbar sein. Darüber hinaus können die Fragmente einer einzelnen Datei verstreut auf innerhalb des Dateisystems liegen. Je nach Fragmentierungsgrad des Dateisystem, müsste dann auf einem Data-Node in vielen Fällen weitere Blöcke anderer Knoten nachgeladen werden, da dort spezifische Fragmente der einzelnen Datei liegen könnten. Diese würde das Prinzip der Datenlokalität aushebeln. TODO: abbildung von ext4 dateisystem inklusive datei, welche überall verteilt ist. + letzter Absatz überarbeiten!
+Die naheliegende Variante zur Speicherung der Beweismittel, wäre die Datenträgerabbilder direkt im HDFS abzuspeichern. Allein die Größe der Abbilder wäre nicht problematisch. Um eine entsprechende Aufteilung kümmert sich das HDFS.\\ Allerdings hat die Lösung den entscheidenden Nachteil, bei der Weiterverarbeitung der Daten. Auf Betriebssystemebene lassen sich solche Datenträger einfach mounten. Zumal die meisten Betriebssysteme auch ein großen Teil der unterschiedlichen Dateisysteme auf einem Datenträger erkennen können. Aber innerhalb des Hadoop-Frameworks findet sich keine Unterstützung zum Lesen von beliebigen Dateisystemen. Denn normalerweise nutzen JAVA-Applikationen ein definierte Schnittstelle auf Basis von Dateien, die wiederum vom Betriebssystem bereitgestellt werden. Um die logischen Dateien aus dem Datenträgerabbild extrahieren zu können, müsste für jedes einzelnes Dateisystem eine eigene Implementierung geschrieben werden.\\ 
 
+\noindent
+Darüber hinaus wäre das Extrahieren der Dateien aus einem Dateisystem auf einem Datenträgerabbild auch nicht wirklich performant. Angenommen das Auslesen würde mit Apache Spark durchgeführt werden. Aufgrund der eingangs beschriebenen Datenlokalität (siehe Kapitel \ref{ch:theory_hadoop}) wären auf jedem Knoten einzelne Blöcke von beispielsweise 128 MB Größe vorhanden. Um dann im ext4-Dateisystem eine Datei lesen zu können, sollten zumindest die Dateisystemmetadaten verfügbar sein. Darüber hinaus können die Fragmente einer einzelnen Datei verstreut innerhalb des Dateisystems liegen. Je nach Grad der Fragmentierung des Dateisystems, müsste dann auf einem Data-Node innerhalb des Clusters schlimmstenfalls dutzende weitere Blöcke anderer Knoten nachgeladen werden, um den Inhalt einer einzelnen Datei zu verarbeiten. Dies würde das Prinzip der Datenlokalität aushebeln. Abbildung \ref{fig:ext4_to_hdfs} skizziert diese verstreute Aufteilung einer Datei im physikalischen Hadoop Cluster.\\ 
+% Abbildung TODO: Inode #23 enthält nur Metadaten! Nicht die ganze Date ist ein Inode.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/ext4_to_hdfs.pdf}
+  \caption{Aufteilung der Daten des Datenträgerabbildes im Hadoop-Cluster}
+  \label{fig:ext4_to_hdfs}
+\end{figure}
 
-\subsubsection{Variante 2 - Logische Dateien im HDFS speichern}
+\noindent
+Das Abbild zeigt eine Datei, welche aus logischer Sicht einen Dateinamen, Metadaten (beispielsweise Zugriffsrechte) und einen Inhalt besitzt. Der Inhalt ist in 9 Blöcken zu jeweils 2048 Byte aufgeteilt.\footnote{Die Blockgröße wird hierbei vom Ext4-Dateisystem bestimmt und ist die kleinste allozierbare Einheit im Dateisystem. In der physikalischen Aufteilung im HDFS Dateisystem gibt es auch Blöcke, welche aber beispielsweise eine Größe von 128 MB aufweisen (orange in Abbildung \ref{fig:ext4_to_hdfs}).} Um nun den Inhalt aus dem ext4-Dateisystem einer Datei auszulesen. Wird zuerst der Superblock benötigt. Dieser enthält allgemeine Informationen zum Dateisystem. Darauf wird die Gruppendeskriptortabelle benötigt, um auf einzelne Blockgruppen zuzugreifen.\footnote{Das Dateisystem selbst in mehrere autarke Bereiche unterteilt, welche für sich genommen eigenständig Daten einer Teilmenge aller Dateien vorhalten. Dies sind sogenannten Blockgruppen.} Über eine Blockgruppe kann wiederum auf die Inode-Tabelle zugegriffen werden. Diese speichert die Metadaten einzelner Dateien als sogenannte Inodes ab. Ein konkreter Inode-Eintrag hält wiederum Verweise auf die konkreten Blöcke, welche den Dateiinhalt beschreiben. Der Dateiname selbst wiederum in den logisch übergeordneten Verzeichnissen gespeichert. Das oberste Verzeichnis, ist das Wurzelverzeichnis. Dieses enthält den Namen einer Datei und die Referenz zum Inode.\\
+
+\noindent
+Letztlich zeigt diese Struktur, dass selbst beim Auslesen einer kleinen Datei etliche Speicherstellen innerhalb des Dateisystems gelesen und interpretiert werden müssen. Angenommen, dass ein konkretes ext4-Dateisystem in einer 100 GB großen Partition gespeichert wird, so wir diese große Datei im HDFS-Dateisystem in 800 große Blöcke zu je 128 MB aufgeteilt und auf den einzelnen Knoten des Clusters gespeichert. Hierbei kann aber kein Einfluss darauf genommen werden, wo welche Blöcke mit welchem Inhalt gespeichert werden. Letztlich bedeutet dies wiederum, wenn in einem Apache Spark Executor zu Verarbeitung der Daten eine Datei des Knotens gelesen werden soll, müssen prinzipiell etlichen Datenbereiche von anderen Knoten angefordert werden. Und dadurch wird auf Netzwerkebene unnötig viel Last erzeugt. Letztlich gilt für das Prinzip der Datenlokalität, dass die einzelnen Blöcke im HDFS möglichst unabhängig von einander verarbeitet werden können. Diese Problematik trifft übrigens nicht nur bei Ext-Dateisystemfamilie auf sondern auch bei anderen Dateisystemen.\\
+
+\noindent
+Aus den oben genannten Gründen ist die direkte Speicherung kompletter Datenträger im HDFS nicht geeignet für die Analyse im Hadoop-Cluster.
+
+\subsection{Variante 2 - Logische Dateien im HDFS speichern}
 Die zweite Variante wäre das Beweismittel auf dem lokalen Analyserechner zu mounten und alle Dateien auf logischer Ebene direkt in das HDFS zu importieren. 
 Damit wäre die gesamte Dateisystemstruktur aus dem Datenträgerabbild im HDFS abgelegt. Allerdings wäre File Carving beziehungsweise das Auffinden von gelöschten Dateien nicht mehr im Hadoop-Framework möglich, sofern nicht auch der das Datenträgerabbild selbst nochmals in das HDFS importiert wird.\\ 
 
@@ -79,19 +106,47 @@ Aus diesen Gründen ist die Variante 2 nicht akzeptabel.
 \noindent
 TODO: weiterer Aspekt - performantes Prozessieren von vielen kleinen Dateien / bwz. Dateien unterschiedlicher Größe!!!\\
 
-\subsubsection{Variante 3 - ZIP-File bzw. Hadoop Archive?}
+\subsection{Variante 3 - ZIP-File bzw. Hadoop Archive?}
+Die Nachteile aus Variante 2 beziehen sich in erster Linie auf die Speicherung der Datei-Metadaten. Diese sollten nicht als erweiterte Dateiattribute im HDFS gespeichert werden, da sie sonst bei der Verarbeitung den Name Node im Hadoop Cluster überfordern könnten. Ein weiterer Nachteil wäre hierbei auch, dass das HDFS sehr gut mit großen Dateien umgehen kann, aber für kleine Dateien ( << 128 MB) nicht ausgelegt ist. Weil eben die Metadaten im Name Node gespeichert werden und generell der Ressourcenaufwand der Speicherung einer HDFS-Datei nicht im Verhältnis zu einer kleinen 1 kByte-Datei steht. Dies zeigt sich auch bei den Testdaten. Auf einem 10 GB großen Testdatenträgerabbild wurde ein Ubuntu-Linux installiert und einige Nutzeroperationen durchgeführt. Nachfolgende Abbildung zeigt die Anzahl der Dateien gruppiert nach deren Größe. Hier wird deutlich, dass es bei der Analyse von Datenträgern primär um das Verarbeiten sehr vieler und sehr kleiner Dateien geht. 
 
-
-\subsubsection{Variante 4 - Costum Forensic Format}
+Costum Forensic Format
 Metadaten,Blockaufteilung,logische Sicherung\\
 nachteil, carving muss vorher passieren...
 
-\subsubsection{Variante 5 - Speicherung mit HBASE und HDFS}
+Nachteil, wenn Metadaten (Hashes,File-Typen, etc...) hinzukommen müssten die Dateien neu berechnet werden...
+
+\subsection{Variante 4 - Speicherung mit HBASE und HDFS}
 Diese Variante beschreibt einen Ansatz, bei welchem die Metadaten und sehr kleine Dateien direkt in HBASE persistiert werden. Dateien größer 10 MB werden direkt im HDFS abgelegt und im jeweiligen Dateieintrag in HBASE verlinkt. Auch hier muss beim Import der Daten eine eigene Anwendung die Informationen aus dem Datenträgerabbild auslesen und entsprechend ihrer Struktur in HBASE und HDFS speichern. Das GitHub-Projekt \textit{foam-data-import} enthält diese Anwendung (siehe \url{https://github.com/jobusam/foam-data-import}).\\
+
+
+Abbildung \ref{fig:data_import} skizziert die Datenaufbereitung und Speicherung in HBASE und im HDFS.\\
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/datenimport_hadoop.png}
+  \caption{Datenimport in HBASE und HDFS}
+  \label{fig:data_import}
+\end{figure}
+
+\subsubsection{Datenmodell}
+
+Das Datenmodell beschreibt die Struktur der Metadaten und verdeutlicht den Informationsgehalt der forensischen Analyseplattform. 
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|l|p{8cm}|}\hline
+\bfseries Spaltenfamilie & \bfseries Spaltenname & \bfseries Beschreibung
+\csvreader[head to column names]{resource/hbase_datamodel.csv}{}
+{\\\hline \columnfamily & \column & \description}\\\hline
+\end{tabular}
+\caption{Datenmodell in HBASE}
+\label{tab:hbase_datamodel}
+\end{table}
+
+TODO: Datenimport mit unterschiedlicher Dateigröße aufzeigen.
 
 %\noindent
 %TODO: Siehe HBASE MOB (Medium-sized Object Binaries)
-
+TODO: Fazit der vor und nachteile aller varianten, um zu zeigen wie variante 2 besser als 1 ist und variante 3 besser als 2 wäre und variante 4 die beste variante ist!
 \section{Fachliche Probleme bei den Daten}
 
 \subsection{Symbolische Links}
