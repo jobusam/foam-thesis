@@ -65,5 +65,16 @@ Ein weitere Anwendungsfall ist die Indizierung von Texten und Wörtern, welche a
 Der Grund für eine Indizierung dieser Inhalte ist eine schnellere Suche nach beliebigen Wörtern, als bei der reinen Suche in HBASE. Zur Indizierung existieren zwei bekannte Projekt. Diese sind einerseits \textit{Apache Solr} und andererseits \textit{Elasticsearch}. Bei bauen wiederum auf das \textit{Apache Lucene}-Projekt auf. Apache Solr ist ein Open-Source Projekt unter dem Dach der Apache Foundation. Wohingegen Elasticsearch auch als Open-Source Projekt entwickelt wird, jedoch primär von der kommerziellen Firma \textit{Elastic???} verwaltet wird. Diese bietet gerade Zusatzpakete und Support gegen Bezahlung an.
 \subsubsection{Apache Solr}
 Spark-Connector von Databracks vorhanden. Der Connector selbst bietet aber vorzugsweise lesenden Zugriff.
+
+\noindent
+Abbildung \ref{fig:hbase_solr_indexing} stellt die physikalische Aufteilung mit dem hbase-indexer projekt
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/hbase_solr_indexierung.pdf}
+  \caption{Indexierung von Daten aus HBASE in Solr}
+  \label{fig:hbase_solr_indexing}
+\end{figure}
+
 \subsubsection{Elasticsearch}
 Spark-Connector auf RDD-Basis vorhanden. Kerberos-Sicherung nur über X-Pack gegen Geld vorhanden. Rack-Awareness und Verteilung nicht klar. Elasticsearch baut eigene Infrastruktur auf. Nicht über Ambari steuerbar.
