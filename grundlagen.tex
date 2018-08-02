@@ -241,5 +241,51 @@ Wie bei HBASE in Kapitel \ref{sec:theory_hbase} bereits erwähnt, kann ein Clien
 \noindent
 Normalerweise ist Zookeeper auf mehreren Knoten im Cluster installiert. Sie bilden ein sogenanntes \textit{ZooKeeper Ensemble} und bestehen zumeist aus 3 oder 5 Einzelinstallationen auf beliebigen Knoten. Ein ZooKeeper Ensemble, welches für die gleiche Anwendungsdomäne zuständig ist, wird auch \textit{Quorum} genannt. Innerhalb eines Quorums gibt es einen Leader und mehrere Follower, die sich die gleichen Konfigurationsinformation teilen. Fällt der Leader aus, können die Follower einen neuen Leader bestimmen.\cite{zookeeper_essentials}\\
 
-\section{Apache Solr}
+\section{Apache Solr und Lucene}
 \label{sec:theory_solr}
+\textit{Apache Solr\texttrademark\thinspace} ist eine skalierbare und performante Plattform zur Datensuche. Die Daten werden vorher indexiert und könne extrem schnell durchsucht werden.\cite{solr_search}\\
+Dadurch kann der forensische Analyse im Rahmen der Thesis schnell und einfach Millionen von Datensätzen nach bestimmten Stichwörtern durchsuchen.\\
+
+\noindent
+Solr besitzt einen \textit{Cloud-Mode}, welcher es ermöglicht die indexierten Daten verteilt auf mehreren Rechnern zu speichern. Dieser Cloud-Mode wird auch bei der Integration in die Analyseplattform genutzt. Die Hortonworks Dataplatform, welche auf dem Computer-Cluster, installiert ist liefert ein optionales Solr-Paket mit. Primär wird dieses Paket genutzt, um eine performante Suche im HDFS-Dateisystem zu ermöglichen. Jedoch können beliebige Daten in der Solr-Cloud indexiert werden, sobald diese einmal im Computer-Cluster installiert wurde. Darüber hinaus nutzt Solr im Cloud-Mode das bereits beschriebene Zookeeper-Projekt\footnote{Siehe Kapitel \ref{sec:theory_zookeeper}.} zur Koordinierung und Überwachung der einzelnen Knoten.\\
+Innerhalb des Cloud-Modes werden die oben beschriebenen Indizes in mehrere sogenannte \textit{Shards} aufgeteilt. Ein einzelner Shard ist hierbei ein Teil des Indexes, welcher unabhängig von den anderen Shards durchsucht werden kann. So kann bei einer Suchanfrage die Suche parallel auf alle Shards verteilt werden. Einzelne Shards können wiederum auf anderen Knoten repliziert werden, um die Ausfallsicherheit zu gewährleisten. Solr spricht hierbei von Cores. Ein Core ist die physikalische Representation eines logischen Shards auf einem konkreten Knoten. Alle logischen Shards bilden zusammen den Index, welcher bei Solr als sogenannte \textit{Collection} dargestellt wird.\cite{solr_cloud_scaling}\\
+
+\noindent
+Jedes Dokument, welches in einer Collection indexiert werden soll, wird genau einmal ein eines der logischen Shards aufgeteilt. Hierbei wird zuerst anhand einer Strategie, wie beispielsweise mittels Hashwertermittlung eines eindeutigen Dokument-Keys, entschieden in welchen Shard das Dokument aufgenommen werden sollen. Ein logischer Shard wird abermals aufgeteilt in mehrere Replicas, den bereits erwähnten Cores auf den einzeln Knoten. Für jeden logischen Shard wird ein \textit{Leader}-Knoten bestimmt.\footnote{Diese Leader werden mittels Zookeeper im Cluster propagiert.}. Dieser Leader-Knoten speichert einen physikalischen Core des logischen Shards und indexiert im nächsten Schritt das Dokument. Sobald der Index neu aufgebaut wurde, wird die Aktualisierung an die anderen Knoten weitergesendet, welche wiederum eine Replica (Core) des logischen Shards speichern.\cite[S. 867 ff]{solr_ref_guide}\\ 
+Abbildung \ref{fig:solr_cluster_architecture} skizziert die Skalierung im Computer-Cluster.\\
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/solr_cluster_architecture.pdf}
+  \caption{Solr Cloud-Mode im Cluster}
+  \label{fig:solr_cluster_architecture}
+\end{figure}
+
+
+\noindent
+Im Allgemeinen ist ein Suchsystem in mehrere Analyseschritte aufgeteilt. Ein Großteil dieser Verarbeitungsschritte wird nicht von Solr selbst übernommen. Vielmehr baut Solr auf dem Open-Source Projekt \textit{Apache Lucene\texttrademark\thinspace} auf und erweitert Lucene letztlich um eine skalierbare Infrastruktur und diverse Schnittstellen zur Verarbeitung der Daten.\\
+Zu Beginn liegen beliebige Daten in Form von Dateien oder Dokumente vor. Diese Daten durchlaufen eine textuelle Aufbereitung bevor sie indexiert werden können.\\ 
+Bei der Textanalyse wird der relevante Text aus den Daten extrahiert. Hierbei hängt die Extraktion der Daten auch davon ab, ob die Daten strukturiert, semistrukturiert oder unstrukturiert sind. Anhand der Dateiformate können dann diverse Bibliotheken genutzt werden, um Daten zu extrahieren. Beispielsweise kann mithilfe von \textit{Apache PDFBox\textsuperscript{\textregistered}}\footnote{Siehe \url{https://pdfbox.apache.org/}, letzter Zugriff: 01.08.2018} Text aus PDF-Dokumenten extrahiert werden. Mithilfe der \textit{Geospatial Data Abstraction Library (GDAL)}\footnote{Siehe \url{https://pdfbox.apache.org/}, letzter Zugriff: 01.08.2018} können Geo-Positionen aus den EXIF-Metadaten von JPEG-Bildern extrahiert werden. Oder mithilfe \textit{Tesseract OCR}\footnote{Siehe \url{https://github.com/tesseract-ocr/tesseract}, letzter Zugriff: 01.08.2018} könnte auch lesbarer Text direkt aus Bildern extrahiert werden.\cite[S. 39]{solr_search}\\
+
+\noindent
+Im nächsten Schritt wird dieser extrahierte Text aufbereitet. Diese Aufbereitung hängt auch stark von dem spezifischen Anwendungsfall und den Daten selbst ab. Im Allgemeinen werden Satzzeichen und überflüssige Füllwörter entfernt und Großbuchstaben werden in Kleinbuchstaben umgewandelt. Darüber hinaus kann auch eine Stammformreduktion durchgeführt werden. Darauf aufbauend kann der Text weitergehend analysiert werden. Beispielsweise könnten Redewendungen erkannt oder Synonyme einzelner Wörter identifiziert werden.\cite[S.44]{solr_search}\\
+
+\noindent
+Nach der Aufbereitung des Textes erfolgt die Erstellung eines sogenannten \textit{Inverted Indexes}. Ein \textit{Inverted Index} ist ähnlich aufgebaut, wie ein Stichwortverzeichnis. Jedes Wort wird darin mit den Verweisen zu den Vorkommen in den einzelnen Dokumenten versehen. Auf Basis dieses Indexes können sehr schnell alle Dokumente gefunden werden, welche das gesuchte Wort enthalten.\cite[S. 47]{solr_search}
+
+\noindent
+Im nächsten Schritt können nun Suchanfragen auf die erstellen Indizes durchgeführt werden. Aber auch hier gibt es unterschiedliche Modelle, wie die relevanten Dokumente ermittelt werden und vor allem auch in welcher Reihenfolge die Ergebnismenge zurückgeliefert wird.\\
+Hier existiert das sogenannte \textit{Boolean Model} auf Basis der booleschen Algebra. Beispielsweise könnte eine forensische Suchanfrage lauten: Suche alle Bilder oder Videos, welche das Wort \textit{Unfall} im Dateinamen haben aber nicht kleiner sind als 1 MB. Diese Suchanfrage wird in einen booleschen Ausdruck überführt und die Dateien werden zurückgeliefert. Allerdings liefert dieses Modell keine Aussage über die Reihenfolge der Ergebnismengen. Hierzu gibt es komplexere Suchmodelle, wie das sogenannte \textit{Vector Space Model}. Es basiert auf gewichtete Faktoren und ermöglicht es für jedes Dokument der Ergebnismenge die Trefferwahrscheinlichkeit zu ermitteln. Nach dieser Bewertung wird die Reihenfolge der Ergebnisse ermittelt. Beispielsweise sollte ein Dokument eine höhere Bewertung erhalten, wenn das gesuchte Wort mehrfach im Dokument vorhanden ist.\cite[S. 47 ff]{solr_search}\\
+
+\noindent
+Apache Solr und Lucene sind beide in Java implementiert. Daher gibt es auch einen Java Client, zur Durchführung von Suchanfragen. Andererseits existiert auch eine REST-Schnittstelle. Damit können Anfragen simpel und schnell in beliebige Websites integriert werden, oder direkt mit dem Kommandozeilentool \textit{curl} durchgeführt werden. Hierbei können die Anfragen in XML oder JSON formatiert sein. Ein simples Beispiel zeigt nachfolgende Anfrage (siehe Abbildung \ref{fig:solr_request}).\\
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/solr_request.png}
+  \caption{Solr-Suchanfrage via \textit{curl}}
+  \label{fig:solr_request}
+\end{figure}
+
+\noindent
+Die Solr-Instanz ist unter \url{localhost:8983} erreichbar ist. Die Suchanfrage selbst wird auf der Collection \textit{forensicMetadata} ausgeführt. Es soll in allen Feldern nach einem Vorkommen von dem Wort \textit{shot} (\textit{q=*shot*}) gesucht werden. Die Antwort ist im JSON-Format definiert. Unter anderem wird die Anzahl der Treffer (\textit{numFound:1}) mitgeliefert. Bei dieser konkreten Anfrage, wurde ein Bild mit dem Dateinamen \textit{Screenshot...} gefunden. 
