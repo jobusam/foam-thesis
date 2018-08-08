@@ -1,14 +1,63 @@
 \chapter{Datenspeicherung}
 \label{ch:data_persistence}
 
-\section{Allgemeines}
-Im Praxisteil dieser Arbeit soll eine Analyse-Plattform auf Basis von Hadoop aufgebaut werden. Um die fachlichen Anforderungen an das Analyse-System herauszuarbeiten, soll das herkömmliche Analysevorgehen betrachtet werden.\\
-Die Ausgangslage liefert beispielsweise ein Testszenario, welches ein Datenträgerabbild eines virtualisierten Linux-PCs enthält. Das Abbild selbst ist 10 GB groß.\\
+\section{Allgemeiner forensischer Analyseprozess}
+Im Praxisteil dieser Arbeit soll eine Analyseplattform auf Basis von Apache Hadoop aufgebaut werden. Diese Analyseplattform dient zur Auswertung sichergestellter Beweismittel und dem Auffinden von Beweisen in großen Datenmengen. Hierbei behandelt die Analyseplattform aber nur einen Teil der Arbeitsvorgänge während einem forensischen Analyseprozess.\\
 
 \noindent
-Dieses Abbild soll als Referenz für die einzelnen Analyse-Schritte gelten. 
-Hierbei sollen in jedem der nachfolgenden Unterkapitel die fachlichen Verarbeitungsschritte auf herkömmlichen Wege mit der hier erstellten Analyse-Plattform verglichen werden.\\
-Ein gängiges Analysevorgehen besteht aus der Speicherung des Abbildes auf dem lokalen Analyse-Rechner und dem Analysieren des Beweismittels mit Betriebssystemprogrammen unter Linux oder mithilfe des Open-Source Analysetools \textit{Autopsy}\footnote{Siehe \url{https://www.sleuthkit.org/autopsy/}. Hierbei wird die Version 4.6.0 in der 64-bit Variante unter Windows 10 Pro genutzt.} unter Windows. Im kommerziellen Bereich existieren noch deutlich mehr Analyse-Tools mit größerem Funktionsumfang. 
+Abbildung \ref{fig:digital_forensics_process} skizziert einen allgemeinen forensischen Analyseprozess für digitale Beweismittel.\cite[S.16]{digital_forensics} Die grün hinterlegten Schritte definieren den Arbeitsbereich, bei welchen die hier entwickelte forensische Analyseplattform den Forensiker unterstützen kann.\\ 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/digital_forensics_process.pdf}
+  \caption{Forensischer Analyseprozess für digitale Beweismittel (Vgl. \cite[S.16]{digital_forensics})}
+  \label{fig:digital_forensics_process}
+\end{figure}
+
+
+\noindent
+Zu Beginn existiert ein Vorfall oder ein Tatverdacht für eine Straftat. In einem nachfolgenden Schritt ermittelt beispielsweise die Staatsanwaltschaft. Im Ermittlungsverlauf wird darauf der Tatort untersucht oder auch bei Tatverdächtigen nach Hinweisen für die Tat und gegebenenfalls deren Tathergang gesucht. Dieser Schritt beschreibt die Identifikationsphase aus Abbildung \ref{fig:digital_forensics_process}. Hierbei geht es um die Identifikation von möglichen Beweismittel, welche sichergestellt oder  beschlagnahmt werden sollen.\cite[S. 17-24]{digital_forensics}.\\ In der Forensik wird häufig hypothesenbasiert vorgegangen. So entwickelt der Ermittler eine Hypothese, wie eine möglich Straftat begangen wurde und wer diese begangen haben könnte. Darauf aufbauend überlegt er sich welche Spuren für oder gegen diese Hypthese sprechen und welche möglichen Beweismittel eben diese Spuren enthalten könnten (z.B. Kommunikationsdaten auf dem PC oder Bildmaterial auf einem Mobiltelefon).\\
+
+\noindent
+Im zweiten Schritt aus Abbildung \ref{fig:digital_forensics_process} geht es um das Vereinnahmen von potentiellen Beweismitteln. Hierbei werden dann die identifizierten Datenträger und Geräte sichergestellt oder beschlagnahmt. In dieser Phase werden beispielsweise auch schon forensisch korrekte Datenträgerabbilder erstellt, auf welchen dann später eine Datenanalyse ausgeführt werden kann.\cite[S. 24-33]{digital_forensics}. In vielen Fällen, beispielsweise bei Unternehmensservern, werden nicht die Geräte selbst sichergestellt sondern nur wichtige Daten forensisch korrekt kopiert. Auch hier findet teilweise schon eine Vorselektion statt, welche Daten benötigt werden und welche Daten im konkreten Fall irrelevant sind.\\
+
+\noindent
+Die dritte Phase aus Abbildung \ref{fig:digital_forensics_process} behandelt das Sichten und Aufbereiten der sichergestellten Daten. Gerade bei großen unstrukturierten Datenmengen erfolgt in dieser Phase auch eine Vorselektion, um die Datenmenge nochmals einzugrenzen. Dies kann automatisiert oder auch manuell erfolgen.\cite[S. 33-39]{digital_forensics}. An dieser Stelle beginnt das Anwendungsgebiet der hier entwickelten forensische Analyseplattform. 
+So können all gesammelten Daten in die forensische Analyseplattform importiert und prozessiert werden. Darauf kann über eine allgemeine Suche nach spezifischen Stichworten, Hashsummen oder Zeitpunkten gesucht werden. Dies soll dem Ermittler das Auffinden von fallreleventen Daten erleichtern. \\
+In dieser Phase werden aber auch gelöschte, verschlüsselte oder verschleierte Daten wiederhergestellt oder entschlüsselt, sofern dies möglich ist. Eine klassische Methode ist beispielsweise auch das sogenannte \textit{File Carving} auf Datenträgern.\cite[S. 38-39]{digital_forensics}\footnote{Beim File Carving wird versucht logisch zusammenhängende Daten allein anhand des Dateiinhalts zu rekonstruieren, ohne die Dateisystemmetadaten zu nutzen. Die Methode wird gerne angewendet, wenn das Dateisystem nicht wiederherstellbar ist oder wenn gelöschte Dateien auf bereits freigegebenen Speicherbereichen gesucht werden.} Diese Art von Datenaufbereitung beherrscht die hier entwickelte forensische Analyseplattform derzeit noch nicht.\footnote{Es wäre aber durchaus möglich diverse Methoden der Datenaufbereitung zu implementierten. Siehe auch Kapitel \ref{ch:ausblick}.}\\
+
+\noindent
+Auch in der anschließenden Analysephase kann die hier entwickelte forensische Analyseplattform genutzt werden (siehe Abbildung \ref{fig:digital_forensics_process}). In dieser Phase werden die aufbereiteten Daten detailliert analysiert, um Informationen zu erhalten die für oder gegen einen bestimmten Tathergang sprechen.\cite[S. 39-45]{digital_forensics} Anhand dieser Informationen werden die eingangs beschriebenen Hypothesen zu möglichen Tathergängen verifiziert. Bei einer Analyse werden aus den Daten komplexe Zusammenhänge und Beziehungen erarbeitet. Beispielsweise werden aus den Rohdaten Kommunikationsverläufe auf Basis von E-Mails oder zeitliche Abläufe basierend auf Zeitstempelanalysen erstellt.\cite[S. 33-39]{digital_forensics}\\
+Hierbei geht es auch darum die Aussagekraft eines potentiellen Beweismittels zu ermitteln. So könnte beispielsweise urheberrechtsverletzendes Material auf einem Datenträger eines PCs gefunden werden. Allerdings kann die Aussagekraft dieses potentiellen Beweismittels sehr gering sein, wenn das System bereits durch Schadsoftware kompromittiert wurde.\\
+Einige Analyseschritte können automatisiert werden und sind daher prädestiniert für die hier entwickelt Analyseplattform (siehe auch Kapitel \ref{ch:data_processing}).\\
+
+\noindent
+Bei der Analyse können auch wieder Verbindungen zu neuen potentiellen Beweismitteln gefunden werden, welchen dann wieder über den forensischen Analyseprozess vereinnahmt und aufbereitet werden. Daher ist der Prozess auch iterativ anzusehen. Gerade durch die Nutzung der forensischen Analyseplattform sollen diese Iterationen verkürzt werden, indem durch die parallelisierte Prozessierung Zeit eingespart werden soll.\\
+
+\noindent
+In der letzten Phase des Analyseprozesses müssen die Ermittlungsergebnisse visuell aufbereitet werden, um sie auch vor Gericht präsentieren zu können. Letztlich muss ein Analysebericht erstellt werden, welcher einerseits die Ergebnisse enthält und andererseits nachvollziehbar beschreibt, wie diese Analyseergebnisse zustande gekommen sind.\footnote{Der Bericht sollte so geschrieben sein, dass andere Parteien oder Ermittler die gleichen Ergebnisse reproduzieren können.}\cite[S. 45-47]{digital_forensics}. Viele Analysetools, unter anderem auch das hier genutzt Referenztool \textit{Autopsy}, ermöglichen die semi-automatische Erstellung von Analyseberichten. Die hier entwickelte Analyseplattform kann dies derzeit noch nicht. Bei einer Weiterentwicklung der Analyseplattform wäre diese Funktionalität aber durchaus brauchbar.\\
+
+\noindent
+Ein primärer Aspekt bei dem allgemeinen forensischen Analyseprozess aus Abbildung \ref{fig:digital_forensics_process} ist letztlich die Dokumentation der Beweismittelkette. Mit ihr steht und fällt die Aussagekraft der Ergebnisse aus einer forensischen Analyse.\footnote{In der Vergangenheit gab es immer wieder Fälle, bei welchen eine fehlerhaft dokumentierte Beweismittelkette zu sehr fragwürdigen Aussagen auch bei ursprünglich eindeutigen Beweislagen führte.} Daher muss bei der Dokumentation der Beweismittel lückenlos festgehalten werden, was mit letzteren passiert ist. Nachfolgende Liste lieferte hierzu wichtige Kriterien, die festgehalten werden müssen:
+\begin{itemize}
+\item Die Ermittler, welche das Beweismittel sichergestellt und später analysiert haben.
+\item Die Prozesse, Datenaufbereitungen und Analysen, welche durchgeführt wurden.
+\item Die Zeitpunkte der Sicherstellung, Aufbereitung und der Analyse.
+\item Die Umstände, wie das Beweismittel sichergestellt wurde.
+\item Gründe, wieso das Beweismittel sichergestellt wurde.
+\item Transportwege und Lagerstätten der Beweismittel.
+\item Personen die Zugang zu den Beweismittel hatten und allgemeine Informationen, wie die Beweismittel vor unbefugten Zugriff geschützt wurden.
+\end{itemize}
+
+Ein sehr wichtiger Punkt bei der Dokumentation der Beweismittelkette ist Verifikation der Datenintegrität des Beweismittels während des gesamten Analyseprozesses. Dies wird primär durch die Prüfung mittels kryptografischer Hashes erreicht. Letztlich dienen diese zum Schutz vor einer unbeabsichtigten oder beabsichtigten Modifikation des Beweismittels. Das Ändern von Beweismittel oder deren Kopien sollte eigentlich immer vermieden werden. In vielen Fällen ist dies jedoch notwendig, um beispielsweise defekte Datenstrukturen wiederherstellen zu können. Bei solchen bewussten Datenänderungen ist eine entsprechende Dokumentation notwendig.\\ 
+Bei der Analyse mit der hier entwickelten Analyseplattform muss auch die Beweismittelkette entsprechend dokumentiert werden. Diese Thematik wird im Rahmen dieser Thesis zumindest in der Theorie nochmals diskutiert. Die derzeitige Implementierung der forensischen Analyseplattform behandelt diesen Aspekt derzeit noch nicht. Aber auch hier könnte in einer Weiterentwicklung eine Beweismittelkette erstellt werden, welche die einzelnen Verarbeitungsprozesse, Zeitpunkte und Nutzerzugriffe dokumentiert.\\
+
+\noindent
+Um die fachlichen Anforderungen an das Analyse-System herauszuarbeiten, soll das herkömmliche Analysevorgehen mit einem vergleichbaren Open-Source Analysewerkzeug betrachtet werden.\\
+Die Ausgangslage liefern einige Datenträgerabbilder aus diversen Testszenarien. Diese Datenträgerabbilder liegen im realen forensischen Analyseprozess beispielsweise nach der Sicherung der beschlagnahmten Beweismittel vor.
+
+\noindent
+Bei gängigen Analysevorgehen werden beispielsweise die Datenträgerkopien mit Betriebssystemprogrammen unter Linux oder mithilfe des Open-Source Analysetools \textit{Autopsy}\footnote{Siehe \url{https://www.sleuthkit.org/autopsy/}. Hierbei wird die Version 4.6.0 in der 64-bit Variante unter Windows 10 Pro genutzt.} unter Windows analysiert. Im kommerziellen Bereich existieren noch deutlich mehr Analyse-Tools mit größerem Funktionsumfang. Nachfolgend wird Autopsy als Referenzsystem unter Windows betrachtet.\\ 
+
 
 \section{Traditionelles Analysevorgehen}
 In einem traditionellen Analysefall wäre als Beweismittel ein Datenträgerabbild des verdächtigen Computers erstellt worden. Mithilfe klassischer Opensource-Tools wie beispielsweise \textit{dd} kann damit zum Beispiel ein Image im RAW-Format erstellt werden. Andere Tools, wie beispielsweise \textit{FTK-Imager} können auch Datenträgerabbilder in speziellen Container-Formaten erstellen und lesen. Beispielsweise gibt es das \textit{EnCase Physical}-Format mit der Dateiendung \textit{e01}, oder das \textit{Advanced Forensic Format} mit der Endung \textit{.aff}.\footnote{Siehe \url{https://support.accessdata.com/hc/en-us/articles/222778608-What-Image-Formats-Do-AccessData-Products-Support-}, Stand: 4.4.2018.}.\\
@@ -43,7 +92,6 @@ Die naheliegende Variante zur Speicherung der Beweismittel, wäre die Datenträg
 
 \noindent
 Darüber hinaus wäre das Extrahieren der Dateien aus einem Dateisystem auf einem Datenträgerabbild auch nicht wirklich performant. Angenommen das Auslesen würde mit Apache Spark durchgeführt werden. Aufgrund der eingangs beschriebenen Datenlokalität (siehe Kapitel \ref{ch:theory_hadoop}) wären auf jedem Knoten einzelne Blöcke von beispielsweise 128 MB Größe vorhanden. Um dann im ext4-Dateisystem eine Datei lesen zu können, sollten zumindest die Dateisystemmetadaten verfügbar sein. Darüber hinaus können die Fragmente einer einzelnen Datei verstreut innerhalb des Dateisystems liegen. Je nach Grad der Fragmentierung des Dateisystems, müsste dann auf einem Data-Node innerhalb des Clusters schlimmstenfalls dutzende weitere Blöcke anderer Knoten nachgeladen werden, um den Inhalt einer einzelnen Datei zu verarbeiten. Dies würde das Prinzip der Datenlokalität aushebeln. Abbildung \ref{fig:ext4_to_hdfs} skizziert diese verstreute Aufteilung einer Datei im physikalischen Hadoop Cluster.\\ 
-% Abbildung TODO: Inode #23 enthält nur Metadaten! Nicht die ganze Date ist ein Inode.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{./resource/ext4_to_hdfs.pdf}
