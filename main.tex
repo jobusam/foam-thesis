@@ -19,7 +19,9 @@
 \usepackage{subcaption} %for logos
 \usepackage{listings} % used for source code listings
 \usepackage[svgnames]{xcolor} % color is used for background color in listings
-\usepackage[colorlinks=true, linkcolor=Black,citecolor=Black,urlcolor=MidnightBlue]{hyperref} % for urls and hyperrefs -> use linkcolor to set a proper value for all links like DarkBlue or DarkGreen
+
+%PassOptions with hyphens is used to correctly set line breaks on long urls. The url package is internally loaded by hyperref package!
+\PassOptionsToPackage{hyphens}{url}\usepackage[colorlinks=true, linkcolor=Black,citecolor=Black,urlcolor=MidnightBlue]{hyperref} % for urls and hyperrefs -> use linkcolor to set a proper value for all links like DarkBlue or DarkGreen
 \lstdefinestyle{customc}{
   belowcaptionskip=1\baselineskip,
   breaklines=true,
