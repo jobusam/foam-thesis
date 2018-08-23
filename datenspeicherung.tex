@@ -210,8 +210,9 @@ Die vorangegangene Variante überzeugt nicht, da die Speicherung vieler kleiner 
 Das Hauptziel dieser Dateiformate ist viele kleine Daten auch auch Dateien in größere Dateien zu speichern, um eine bessere Parallelisierung und eine effiziente Speicherung in Hadoop zu ermöglichen. Oftmals unterstützen diese Formate auch eine Datenkompression, um gegebenenfalls Speicherplatz sparen zu können. Viel wichtiger ist jedoch die Teilbarkeit dieser Dateiformate. Wie bereits beschrieben, werden Dateien im HDFS in größere Blöcke geteilt und im HDFS auf unterschiedlichen Knoten gespeichert. Innerhalb eines Blocks muss es also möglich sein, einzelne Einträge beziehungsweise Datensätze lesen zu können. Die oben erwähnten Hadoop Dateiformate unterstützen eben diese Teilbarkeit.\footnote{Im Gegensatz hierzu sind beispielsweise die meisten Dateisysteme in einer Partition eben nicht teilbar. Denn wenn ein Block in der Mitte des Dateisystems ausgelesen werden soll, so können die Daten nicht ohne die Dateisystemmetadaten interpretiert werden. Daher ist auch die erste Variante aus Kapitel \ref{subsec:variant1} eben nicht im HDFS anwendbar.}\\
 
 \noindent
-Nachfolgend soll das \textit{Sequence File}-Format in Abbildung \ref{fig:sequence_file_format} näher betrachtet werden.\footnote{Siehe auch \cite[S. 134]{hadoop_definitive_guide} und \url{https://hadoop.apache.org/docs/r2.7.5/api/org/apache/hadoop/io/SequenceFile.html}, Stand 18.8.2018.}\\
+Nachfolgend soll das \textit{Sequence File}-Format in Abbildung \ref{fig:sequence_file_format} näher betrachtet werden.\footnote{Siehe auch \cite[S. 134]{hadoop_definitive_guide} und \url{https://hadoop.apache.org/docs/r2.7.5/api/org/apache/hadoop/io/SequenceFile.html}, Stand 18.8.2018.}
 
+%TODO Beim Header ist die linke Linie nicht an der unteren linken Ecke!
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{./resource/sequence_file_format.pdf}
@@ -219,26 +220,101 @@ Nachfolgend soll das \textit{Sequence File}-Format in Abbildung \ref{fig:sequenc
   \label{fig:sequence_file_format}
 \end{figure}
 
-TODO: Format erklären!!!!
+\noindent
+Das Sequence File Format besteht aus einem Header und mehreren Einträgen. Diese Einträge wiederum sind eigenständige Schlüsselwertpaare, welche die eigentlichen Daten beinhalten. Ein Schlüsselwertpaar,in Abbildung \ref{fig:sequence_file_format} auch \textit{Record} genannt, enthält einen eindeutigen Schlüssel (\textit{Key}) und einen Inhalt (\textit{Value}). Zusätzlich wird am Anfang die Gesamtlänge des Schlüsselwertpaares und die Länge des Schlüssels in Bytes angegeben. Damit ist es möglich den Schlüssel sowie den Inhalt innerhalb des Sequence Files zu bestimmen. Allerdings ist dadurch noch nicht klar, wie der Schlüssel oder Inhalt zu interpretieren ist. Daher sind im Header des Sequence File Formats jeweils die Namen der Java-Klassen in den Feldern \textit{Key Class} und \textit{Value Class} gespeichert, die den Datentyp definieren.  
+Im Header befinden sich auch Informationen, ob und in welcher Form eine Datenkompression auf die Daten angewendet wurde.\\
+Zuletzt werden in unregelmäßigen Abständen sogenannte Sync-Felder abgespeichert. Diese dienen zur Unterstützung der eingangs erwähnten Teilbarkeit des Dateiformats. Eine Anwendung kann sich mithelfe der Sync-Felder von einer beliebigen Stellen aus innerhalb der Datei auf den Anfang eines Schlüsselwertpaares synchronisieren. Damit können auch Schlüsselwertpaare aus einem beliebigen HDFS-Block interpretiert werden.\footnote{Voraussetzung hierbei ist allerdings, dass die Anwendung vorher schon die Datentypen der Schlüsselwertpaare kennt.}\\ 
 
 \noindent
-Prinzipiell könnten nun sehr kleine Dateien (z.B. kleiner 10 MB) in mehrere Sequence Files strukturiert im HDFS gespeichert werden. Diese Variante enthält aber noch einige Hindernisse. Zuerst stellt sich hier die Frage, wie diese Sequence Files erstellt werden sollen. Hierbei müsste die Anwendung zum Datenimport auf dem Analyse-Rechner die Sequence Files zuerst lokal auf dem Rechner erstellen und danach in das HDFS hochladen. Gegebenenfalls müssten diese Sequence Files sogar noch auf dem lokalen Rechner persistent zwischengespeichert werden. Die Datenimport-Anwendung würde entsprechen mehr Ressourcen benötigen. Ein interessanteres Problem ist aber die Datenverarbeitung im HDFS. Angenommen es existieren nun Sequence Files mit den Dateiinhalten und den Metadaten in den Dateien. Mit Spark können diese Sequence Files gelesen werden und beispielsweise die Hashsummen und die Medientypen ermittelt werden.\footnote{Siehe auch Kapitel \ref{ch:data_processing}.} Allerdings müssten beim Schreiben die Daten in neue Sequence Files geschrieben werden. Denn im HDFS ist es nicht möglich existierende Dateien wahlfrei zu modifizieren.\cite[S. 42]{expert_hadoop_admin} Es können maximal neue Daten an das Dateiende einer Datei geschrieben werden. Damit müssten bei der Datenverarbeitung nochmals alle Daten neu geschrieben werden. Dies führt zu unnötigem Ressourcenverbrauch. Andererseits könnten die Rohdaten und die Metadaten in getrennte Sequence Files gespeichert werden. Damit müssten dann nur Sequence Files mit den Metadaten neu geschrieben werden. Es wäre auch denkbar alle neu gewonnen Metadaten in eigenständige neue Sequence Files zu schreiben. Allerdings könnte dies wiederum zu einer Art von Fragmentierung von logisch zusammenhängenden Daten führen. Denn nun wären Metadaten und Rohdaten in mehreren Sequence Files aufgeteilt. Schlimmstenfalls könnten dadurch die Metadaten und Rohdaten, welche eine logische Datei repräsentieren, auf unterschiedlichen Knoten im Hadoop-Cluster liegen. Dies würde das Prinzip der Datenlokalität in gewissem Maße beeinträchtigen.\\
+Prinzipiell können damit sehr kleine Dateien (z.B. kleiner 10 MB) in mehrere Sequence Files strukturiert im HDFS gespeichert werden. Diese Variante enthält aber noch einige Hindernisse. Zuerst stellt sich hier die Frage, wie diese Sequence Files erstellt werden sollen. Hierbei müsste die Anwendung zum Datenimport auf dem Analyse-Rechner die Sequence Files zuerst lokal auf dem Rechner erstellen und danach in das HDFS hochladen. Gegebenenfalls müssten diese Sequence Files sogar noch auf dem lokalen Rechner persistent zwischengespeichert werden. Die Datenimport-Anwendung würde entsprechen mehr Ressourcen benötigen.\\
+Ein interessanteres Problem ist aber die Datenverarbeitung im HDFS. Angenommen es existieren nun Sequence Files mit den Dateiinhalten und den Metadaten in den Dateien. 
+Mit Apache Spark können diese Sequence Files gelesen werden und beispielsweise die Hashsummen und die Medientypen ermittelt werden.\footnote{Siehe auch Kapitel \ref{ch:data_processing}.} Allerdings müssten beim Schreiben die Daten in neue Sequence Files geschrieben werden. Denn im HDFS ist es nicht möglich existierende Dateien wahlfrei zu modifizieren.\cite[S. 42]{expert_hadoop_admin} Es können maximal neue Daten an das Dateiende einer Datei geschrieben werden. Damit müssten bei der Datenverarbeitung nochmals alle Daten neu geschrieben werden. Dies führt zu unnötigem Ressourcenverbrauch. Andererseits könnten die Rohdaten und die Metadaten in getrennte Sequence Files gespeichert werden. Damit müssten dann nur Sequence Files mit den Metadaten neu geschrieben werden. Es wäre auch denkbar alle neu gewonnen Metadaten in eigenständige neue Sequence Files zu schreiben.\\ 
+Allerdings könnte dies wiederum zu einer Art von Fragmentierung von logisch zusammenhängenden Daten führen. Denn nun sind die Metadaten und Rohdaten in mehrere Sequence Files aufgeteilt. Schlimmstenfalls könnten dadurch die Metadaten und Rohdaten, welche eine logische Datei repräsentieren, auf unterschiedlichen Knoten im Hadoop-Cluster liegen. Dies würde das Prinzip der Datenlokalität in gewissem Maße beeinträchtigen. Dies hängt aber auch stark davon ab, wie die Daten für die Verarbeitung angefordert werden. Ist es notwendig die Metadaten und die Rohdaten einer logischen Datei gemeinsam zu verarbeiten, oder können diese auch unabhängig voneinander auf getrennten Knoten prozessiert werden?\\
 
 \noindent
-Zusammengefasst wäre diese Variante technisch möglich. Allerdings besteht eben diese Problematik beim Speichern von neu gewonnen Informationen. Letztlich wäre es durchaus sinnvoll wenn die Rohdaten, die originalen Metadaten aus dem ursprünglichen Dateisystem und die neu gewonnenen Metadaten bei der Datenanalyse für eine logisch Datei auch physikalisch zusammen gespeichert werden.\\ 
-Ein anderer Aspekt ist auch die Komplexität der Anwendung. Bei der praktischen Implementierung dieser Variante müsste immer betrachtet werden, wo nun welche Informationen liegen und wie letztlich alle Informationen zu einer Datei aus den Sequence Files zusammengesetzt werden müssen. Meiner Ansicht nach wäre die Implementierung hierbei schon entsprechend komplex. Darüber hinaus sollen ja nur kleine Dateien in Sequence Files abgelegt werden. Große Dateien hingegen könnten ja direkt im HDFS gespeichert werden. Dies würde die Anwendungskomplexität weiter erhöhen. Auch diese Variante überzeugt nicht zur Datenspeicherung.\footnote{Diese Entscheidung, diese Variante nicht zu verfolgen, erfolgt rein auf den theoretischen Vorüberlegungen. Auf eine prototypische Implementierung dieser Variante wurde verzichtet, weil mit der vierten Variante zur Datenspeicherung ein Ansatz gefunden wurde, der auch schon in der Theorie mehr überzeugt also die Variante mit Sequence Files.}
+Zusammengefasst ist diese Variante technisch möglich. Allerdings besteht eben diese Problematik beim Speichern von neu gewonnen Informationen. Letztlich ist es durchaus sinnvoll wenn die Rohdaten, die originalen Metadaten aus dem ursprünglichen Dateisystem und die neu gewonnenen Metadaten bei der Datenanalyse für eine logische Datei auch physikalisch zusammen gespeichert werden.\footnote{Zumindest sollten die Daten auf dem gleichen Knoten liegen, um Netzwerkverkehr zu vermeiden.}\\ 
+Ein anderer Aspekt ist auch die Komplexität der Anwendung. Bei der praktischen Implementierung dieser Variante müsste immer betrachtet werden, wo nun welche Informationen liegen und wie letztlich alle Informationen zu einer Datei aus den Sequence Files zusammengesetzt werden müssen. Meiner Ansicht nach wäre die Implementierung hierbei schon entsprechend komplex. Darüber hinaus sollen ja nur kleine Dateien in Sequence Files abgelegt werden. Große Dateien hingegen könnten ja direkt im HDFS gespeichert werden. Dies würde die Anwendungskomplexität weiter erhöhen. Daher überzeugt auch diese Variante nicht zur Datenspeicherung.\footnote{Diese Entscheidung, diese Variante nicht zu verfolgen, basiert nur auf den theoretischen Vorüberlegungen. Auf eine prototypische Implementierung dieser Variante wurde verzichtet, weil mit der vierten Variante zur Datenspeicherung ein Ansatz gefunden wurde, der auch schon in der Theorie mehr überzeugt also die Variante mit Sequence Files.}
 
 \subsection{Variante 4 - Speicherung mit HBASE und HDFS}
-Diese Variante beschreibt einen Ansatz, bei welchem die Metadaten und sehr kleine Dateien direkt in HBASE persistiert werden. Dateien größer 10 MB werden direkt im HDFS abgelegt und im jeweiligen Dateieintrag in HBASE verlinkt. Auch hier muss beim Import der Daten eine eigene Anwendung die Informationen aus dem Datenträgerabbild auslesen und entsprechend ihrer Struktur in HBASE und HDFS speichern. Das GitHub-Projekt \textit{foam-data-import} enthält diese Anwendung (siehe \url{https://github.com/jobusam/foam-data-import}).\\
+Die vorherige Variante beschreibt einen möglichen Ansatz zu Speicherung von kleinen Dateien. Allerdings wurde die Speicherung der Metadaten noch nicht optimal gelöst. Zumal beachtet werden sollte, dass während der Datenverarbeitung weitere Metadaten aus den Rohdaten ermittelt und gespeichert werden.\footnote{Siehe Kapitel \ref{ch:data_processing}.}\\
+Da es sich bei den Metadaten um strukturierte Daten handelt, wäre die Speicherung in einer Datenbank naheliegend. Im Hadoop-Umfeld kann hierzu die spaltenorientierte \textit{NoSQL}-Datenbank \textit{Apache HBASE} verwendet werden.\footnote{Siehe Kapitel \ref{sec:theory_hbase}.}\\
+Auch die Speicherung von kleinen Dateien könnte von HBASE übernommen werden. Große Dateien hingegen könnten direkt im HDFS gespeichert werden. 
 
+\subsubsection{Speicherung kleiner Dateien} 
+Diese Problematik von kleinen und großen Dateien wurde bereits in den vorherigen Varianten angesprochen. An dieser Stelle soll diese Thematik nochmals näher betrachtet werden. Nicht zuletzt soll anhand einiger Datenträgeranalysen ein Grenzwert ermittelt werden, nach welchem die Analyseplattform die Dateien entweder in HBASE oder im HDFS ablegt.\\
 
+\noindent
+Wie bereits beschrieben, kann das HDFS mit großen und kleinen Dateien umgehen. Letztlich ist die Speicherung in große Dateien der primäre Anwendungsfall. Im Gegensatz dazu können viele kleine Dateien nicht effizient gespeichert werden. Es geht aber nicht darum, dass eine einzelne kleine Datei weniger effizient abgespeichert werden kann als eine große Datei. Vielmehr kann der Informationsgehalt einer einzeln großen Datei (beispielsweise als Sequence File) effizienter gespeichert werden, als der gleiche Informationsgehalt aufgeteilt in dutzende kleine Dateien. Dies liegt daran, dass für jede Datei Metadaten gespeichert werden. Und diese Metadaten werden auf dem Name Node gespeichert und auch im Arbeitsspeicher vorgehalten.\cite{hdfs_architecture} Ein Eintrag ist beispielsweise ungefähr 150 bis 200 Bytes groß. Für eine Datei wird ein ein Metadateneintrag und ein Blockeintrag im Name Node angelegt (insgesamt 300-400 Byte). Wenn nun ein Million kleine Dateien abgespeichert werden, dann werden 300-400 MB an Arbeitsspeicher benötigt. Dies klingt eigentlich nach einem vertretbaren Ressourcenverbrauch. Letztlich geht es aber auch um die Netzwerklast. Denn bei der Verarbeitung der Daten werden auch eine Million Aufrufe an den Name Node gesendet, da nur er weiß, wo der Dateiinhalt liegt. Wenn nun diese eine Million Dateien in ein einzelnes Sequence File gepackt werden, dann benötigt der Name Node nur 300-400 Byte Arbeitsspeicher und zur Datenverarbeitung werden weniger Netzwerkressourcen benötigt.\\
+
+\noindent
+Nun stellt sich die Frage, ob eine Million Dateien realistisch anzusehen sind und wie groß den kleine Dateien sind. Nachfolgende Abbildungen zeigen hier die Resultate einer Analyse der Dateigröße von diversen Datenträgerabbilder. Abbildung \ref{fig:file_size_c_amount} zeigt hier die kumulierte Häufigkeit der Dateien unterteilt in mehrere Dateikategorien. Diese Kategorien sind logarithmisch nach dem dekadischen Logarithmus aufgeteilt.\footnote{Hierbei wurde die Ergebnismenge der Kategorien linear interpoliert. Der Quellcode zur Berechnung dieser Diagramme wurde unter \url{https://github.com/jobusam/foam-data-analysis-ui} bereitgestellt. } Eine Kategorie beschreibt die Anzahl aller Dateien in einem Datenträgerabbild, welche kleiner als die Kategorie ist. Zum Beispiel existieren auf dem Datenträgerabbild des Windows Systems knapp 400.000 Dateien die kleiner 10 Kilobyte sind.\\
+ 
+ \begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/fileSize_cumulatedAmount.png}
+  \caption{Kumulierte Häufigkeit nach Dateigröße}
+  \label{fig:file_size_c_amount}
+\end{figure}
+
+\noindent
+Nachfolgend werden die Testdaten beschrieben:
+\begin{itemize}
+\item Das \textit{Linux Client System} ist ungefähr 9 GB\footnote{Die Größenangaben entsprechen den reinen Rohdaten der Dateien. Verzeichnisse und Dateisystemmetadaten sind nicht inkludiert.} groß und enthält ein Ubuntu-Betriebsystem. Es wurde als Testdatenträgerabbild im Rahmen Masterthesis erstellt. Das Abbild enthält 150.229 Dateien.\footnote{Es handelt sich ausschließlich um Datendateien. Verzeichnisse, Symbolische Links und Spezielle Dateien wurden nicht berücksichtigt.}
+\item Das \textit{Linux Server System} ist ungefähr 51 GB groß und enthält ein CentOS-Betriebssystem. Das System ist ein Name Node eines kleinen Hadoop-Clusters. Das Abbild enthält 163.555 Dateien.
+\item Das \textit{Windows System} ist ungefähr 207 GB groß und ist ein reales Nutzersystem, welches seit mehreren Monaten eingesetzt wird. Das Abbild enthält 624.650 Dateien.
+\item Der \textit{NAS Datenspeicher} entspricht einem QNAP-System mit ungefähr 257 GB an realen Rohdaten. Hierbei ist auf dem Datenträgerabbild kein Betriebssystem installiert. Es handelt sich hauptsächlich um Dokumente und Mediendateien. Das Abbild enthält 46.215 Dateien.
+\item Die \textit{Externe Festplatte} mit ungefähre 90 GB Daten, wird als Backup für diverse Mediendateien genutzt. Das Abbild enthält 67.809 Dateien.
+\end{itemize}
+
+\noindent
+Da die forensische Analyseplattform mehrere Datenträgerabbilder speichern kann, sollte das System durchaus mehrere Millionen Dateien verarbeiten können. Abbildung \ref{fig:file_size_r_c_amount} relativiert die Ergebnisse der einzelnen Abbilder.\\
+
+ \begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/fileSize_relativeCumulatedAmount.png}
+  \caption{Relativierte kumulierte Häufigkeit nach Dateigröße}
+  \label{fig:file_size_r_c_amount}
+\end{figure}
+
+\noindent
+Anhand der relativierten kumulativen Häufigkeit aus Abbildung \ref{fig:file_size_r_c_amount} wird klar, dass fast 80-90 \% der Dateien kleiner 100 Kilobyte sind und mehr als 95\% der Dateien kleiner 10 Megabyte sind. Allerdings sind diese Angaben mit Vorsicht zu genießen, denn je nach Anwendungsfall können Datenträger beliebige Dateien unterschiedlicher Größe speichern. Ist beispielsweise ein Betriebssystem auf dem Datenträger installiert, existieren allein durch das Betriebssystem tausende von Dateien mit minimaler Dateigröße. Umgekehrt enthält das Datenträgerabbild des NAS-Datenspeichers sehr viele Dateien zwischen 1 und 10 MB. Dies liegt daran, dass von den 46.215 Dateien ungefähr 30.000 Dateien Fotos sind. Diese wiederum sind für gewöhnlich 500 Kilobyte bis 10 Megabyte groß. Die Kurve könnte allerdings anders aussehen, wenn beispielsweise auch Filme und Videos auf dem NAS gespeichert wären.\\
+
+\noindent
+Die nachfolgende Abbildung \ref{fig:file_size_c_file_size} und die Abbildung \ref{fig:file_size_r_c_file_size} zeigen die absolute und relativierte kumulative Kategoriegröße der einzelnen Kategorien an. Die Kategoriegröße beschreibt die Gesamtgröße aller Dateien einer spezifischen Kategorie. Beispielsweise sind bei dem Windows System ungefähr 80 Gigabyte der Gesamtdatengröße in Dateien kleiner 10 Megabyte gespeichert.\\  
+
+ \begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/fileSize_cumulatedCategorieSize.png}
+  \caption{Kumulierte Kategoriegröße nach Dateigröße}
+  \label{fig:file_size_c_file_size}
+\end{figure}
+
+\noindent
+Die relativierte kumulative Kategoriegröße in Abbildung \ref{fig:file_size_r_c_file_size} verdeutlicht den Kontrast in Bezug auf die relativierte kumulative Häufigkeit aus Abbildung \ref{fig:file_size_r_c_amount}. Während mehr als 95\% aller Dateien kleiner 10 Megabyte sind, beansprucht dieser Anteil doch nur ungefähr 10 bis 55 \% der Gesamtspeichergröße.\\
+
+\noindent
+Anhand der Diagramme empfiehlt es sich den Grenzwert der Dateigröße zwischen 1 und 10 Megabyte zu definieren. Für die Implementierung im Rahmen der Thesis wird der Grenzwert für die forensische Analyseplattform auf 10 Megabyte gesetzt. Dies bedeutet, dass alle Dateien kleiner 10 Megabyte direkt in HBASE gespeichert werden. Darunter fallen beispielsweise auch größtenteils Fotos und Dokumente. Und nur die wenigen großen Dateien (größer 10 Megabyte) werden direkt im HDFS gespeichert.  
+
+ \begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{./resource/fileSize_relativeCumulatedCategorieSize.png}
+  \caption{Relativierte kumulierte Kategoriegröße nach Dateigröße}
+  \label{fig:file_size_r_c_file_size}
+\end{figure}
+
+\subsubsection{Aufbau der Anwendung} 
+ 
+Diese Variante beschreibt einen Ansatz, bei welchem die Metadaten und sehr kleine Dateien direkt in HBASE persistiert werden. Dateien ab einer bestimmten Größe (derzeit ab 10 MB Dateigröße) werden direkt im HDFS abgelegt und im jeweiligen Dateieintrag in HBASE verlinkt. Auch hier muss beim Import der Daten eine eigene Anwendung die Informationen aus dem Datenträgerabbild auslesen und entsprechend ihrer Struktur in HBASE und HDFS speichern. Das GitHub-Projekt \textit{foam-data-import} enthält diese Anwendung (siehe \url{https://github.com/jobusam/foam-data-import}).\\
 Abbildung \ref{fig:data_import} skizziert die Datenaufbereitung und Speicherung in HBASE und im HDFS.\\
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{./resource/datenimport_hadoop.png}
+  \includegraphics[width=\textwidth]{./resource/storage_hdfs_and_hbase.pdf}
   \caption{Datenimport in HBASE und HDFS}
   \label{fig:data_import}
 \end{figure}
+
+\noindent
+
 
 \subsubsection{Datenmodell}
 
@@ -257,6 +333,11 @@ Das Datenmodell beschreibt die Struktur der Metadaten und verdeutlicht den Infor
 
 TODO: Datenimport mit unterschiedlicher Dateigröße aufzeigen.
 Dies zeigt sich auch bei den Testdaten. Auf einem 10 GB großen Testdatenträgerabbild wurde ein Ubuntu-Linux installiert und einige Nutzeroperationen durchgeführt. Nachfolgende Abbildung zeigt die Anzahl der Dateien gruppiert nach deren Größe. Hier wird deutlich, dass es bei der Analyse von Datenträgern primär um das Verarbeiten sehr vieler und sehr kleiner Dateien geht. \\
+
+\noindent
+Ein weitere Punkt ist auch die technische Speicherung. In einem einzelnen HDFS-Verzeichnis können maximal 32000 Dateien gespeichert werden?! Hingegen können in einem lokalen Verzeichnis eines ext4-Dateisystems deutlich mehr Dateien gespeichert werden. Bei einem Datenträgerabbild welches mehr als 1048576\footnote{Siehe Konfiguration von \textit{dfs.namenode.fs-limits.max-directory-items}. Dieser Wert kann maximal auf 6.400.000 gesetzt werden. Siehe \url{https://hadoop.apache.org/docs/r3.0.0/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml} Stand: 23.8.2018.} Dateien in einem Verzeichnis speichert, müsst im HDFS ein zweites Verzeichnis zur Speicherung angelegt werden. Somit ist es auch technisch nicht möglich die gleiche logische Verzeichnisstruktur im HDFS aufzubauen. Mit dieser Variante können bei Bedarf wenigstens neue Verzeichnisse im HDFS angelegt werden!
+Bei dem Windows-Verzeichnis sind bereits 2000 Dateien größer 10 MB.
+
 
 %\noindent
 %TODO: Siehe HBASE MOB (Medium-sized Object Binaries)
