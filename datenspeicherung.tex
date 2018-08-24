@@ -247,6 +247,10 @@ Wie bereits beschrieben, kann das HDFS mit großen und kleinen Dateien umgehen. 
 
 \noindent
 Nun stellt sich die Frage, ob eine Million Dateien realistisch anzusehen sind und wie groß den kleine Dateien sind. Nachfolgende Abbildungen zeigen hier die Resultate einer Analyse der Dateigröße von diversen Datenträgerabbilder. Abbildung \ref{fig:file_size_c_amount} zeigt hier die kumulierte Häufigkeit der Dateien unterteilt in mehrere Dateikategorien. Diese Kategorien sind logarithmisch nach dem dekadischen Logarithmus aufgeteilt.\footnote{Hierbei wurde die Ergebnismenge der Kategorien linear interpoliert. Der Quellcode zur Berechnung dieser Diagramme wurde unter \url{https://github.com/jobusam/foam-data-analysis-ui} bereitgestellt. } Eine Kategorie beschreibt die Anzahl aller Dateien in einem Datenträgerabbild, welche kleiner als die Kategorie ist. Zum Beispiel existieren auf dem Datenträgerabbild des Windows Systems knapp 400.000 Dateien die kleiner 10 Kilobyte sind.\\
+
+%TODO !!!!!!!!!!!!!!!!!!!!!!!!!!
+% Diagramme anpassen! Für Kilo,Mega,Giga :1000 und nicht durch 1024!!!!!!!!!!!!!!
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  
  \begin{figure}[ht]
   \centering
@@ -346,7 +350,12 @@ Beschreibung der Parameter:
 
 \item Mit der Option \textit{-c, -{}-caseNumber} kann eine Fallnummer angegeben werden. Damit können mehrere Asservate zu einem bestimmten Fall zugeordnet werden (siehe Kapitel \ref{subsec:data_import_data_model}).
 
+\item Mit der Option \textit{-d, -{}-caseName} kann eine zusätzlich ein Fallname angegeben werden.
+
 \item Die Option \textit{-e, -{}-examiner} kann den Namen des forensischen Analysten enthalten. Aktuell muss kein Namen angegeben werden. Allerdings wäre dies später für eine automatische Generierung eines Reports zur Beweismittelkette (\textit{Chain of Custody}) sinnvoll.\footnote{Diese Funktionalität wurde im Rahmen der Thesis jedoch nicht implementiert.}
+
+\item Mit der Option \textit{-f, -{}-exhibitname} kann eine zusätzlich ein Name des Asservats angegeben werden.
+
 \end{itemize}
 
 \begin{figure}[ht]
@@ -360,32 +369,28 @@ Beschreibung der Parameter:
 \subsection{Datenmodell}
 \label{subsec:data_import_data_model}
 
-Das Datenmodell beschreibt die Struktur der Metadaten und verdeutlicht den Informationsgehalt der forensischen Analyseplattform. 
+In Abbildung \ref{fig:hbase_data_model} wird das Datenmodell der forensischen Analyseplattform beschrieben. Dieses Modell wird in drei Tabellen in HBASE aufgeteilt. 
+Es enthält neben der Speicherung der Metadaten auch das Datenmodell einer rudimentären Fallverwaltung.\\
 
-\begin{table}[!ht]
-\centering
-\begin{tabular}{|l|l|p{8cm}|}\hline
-\bfseries Spaltenfamilie & \bfseries Spaltenname & \bfseries Beschreibung
-\csvreader[head to column names]{resource/hbase_datamodel.csv}{}
-{\\\hline \columnfamily & \column & \description}\\\hline
-\end{tabular}
-\caption{Datenmodell in HBASE}
-\label{tab:hbase_datamodel}
-\end{table}
-
-TODO: 10 MB Grenze für HBASE kompletter Key!!!!!
-Darstellung der Verzeichnisstruktur im HDFS!
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./resource/hbase_data_model.png}
+  \caption{Datenmodell der forensischen Analyseplattform}
+  \label{fig:hbase_data_model}
+\end{figure}
 
 \noindent
-Ein weitere Punkt ist auch die technische Speicherung. In einem einzelnen HDFS-Verzeichnis können maximal 1048576 Dateien gespeichert werden.\footnote{Siehe Konfiguration von \textit{dfs.namenode.fs-limits.max-directory-items}} Hingegen können in einem lokalen Verzeichnis eines ext4-Dateisystems deutlich mehr Dateien gespeichert werden. Dieser Wert kann maximal auf 6.400.000 gesetzt werden.\footnote{ Siehe \url{https://hadoop.apache.org/docs/r3.0.0/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml} Stand: 23.8.2018.}
-Wenn ein Dateisystem mehr Dateien in einem Verzeichnis speichert, müsste im HDFS ein zweites Verzeichnis zur Speicherung angelegt werden. Somit ist es auch technisch nicht möglich die gleiche logische Verzeichnisstruktur im HDFS aufzubauen. Bei dieser Variante können bei Bedarf wenigstens neue Verzeichnisse im HDFS angelegt werden!
-Bei dem Windows-Verzeichnis sind bereits 2000 Dateien größer 10 MB.
+Die Fallverwaltung ist notwendig um den Analysten die Möglichkeit zu geben, mehrere Asservate (z.B. Datenträgerabbilder) in die forensische Analyseplattform zu importieren. Dies ist ein wichtiger Bestandteil um Beziehungen zwischen den Asservaten identifizieren zu können. Ein Fall (\textit{forensicCase}) besteht hierbei aus einer Fallnummer, einem Fallnamen und dem Namen des Auswerters. Die Fallnummer kann beim Datenimport als Parameter angegeben werden. Hierdurch kann der Analyst mehrere Asservate zu einem Fall importieren. Ein Fall kann daher auch mehrere Asservate (\textit{forensicExhibit}) enthalten. Für diese Asservate kann wiederum ein beschreibender Name beim Import angegeben werden. Zusätzlich wird der Zeitpunkt beim Datenimport und das angegeben Basisverzeichnis im HDFS mit abgespeichert. Das Basisverzeichnis wird später bei der Datenverarbeitung ausgewertet um die Dateien größer 10 MB im HDFS lokalisieren zu können.\\
 
-%TODO Fallverwaltung beschreiben
+\noindent
+Ein Asservat kann wiederum mehrere Daten (\textit{forensicData}) enthalten. Dies sind die einzelnen Dateien und ihre Metadaten. Hierbei hat jeder Eintrag eine eindeutige Id, welche als Zeilenschlüssel in HBASE genutzt wird.\footnote{In Abbildung \ref{fig:hbase_data_model} sind diese Zeilenschlüssel dunkelblau hinterlegt.}. Das Attribut \textit{filePath} enthält hierbei den vollständigen Dateipfad inklusive Dateinamen. Im Attribut \textit{fileType} wird gespeichert, ob es sich um eine Datendatei, ein Verzeichnis, einen symbolischen Link und um einer andere spezielle Datei handelt. Abhängig von der Dateigröße wird bei kleinen Dateien der Dateiinhalt direkt in dem Attribut \textit{fileContent} gespeichert. Bei großen Dateien hingegen, wird nur im Attribut \textit{hdfsFilePath} auf den Dateipfad im HDFS referenziert, wo die Datei gespeichert wird. Der Dateipfad im HDFS hingegen ist eine Kombination aus dem angegeben \textit{hdfsBaseDir} und dem Zeilenschlüssel (\textit{id}) des Dateneintrags. Dadurch ist es auch möglich über eine Datendatei im HDFS deren Metadaten in HBASE zu identifizieren. Denn der Zeilenschlüssel in der HBASE-Tabelle \textit{forensicData} ist innerhalb der forensischen Analyseplattform global eindeutig.\\
+Des Weiteren werden noch die Zugriffsrechte, die Besitzer, die Gruppe und die Zeitstempel abgespeichert. Je nach spezifischem Dateisystem des Asservats sind allerdings nicht immer alle Metadaten vorhanden.\\
+Bei der anschließenden Datenverarbeitung in Kapitel \ref{ch:data_processing} wird das bestehende Datenmodell um neue Metadaten erweitert.\footnote{Hierzu gehören die Attribute \textit{mediaType} und \textit{fileHash}, welche in Abbild \ref{fig:hbase_data_model} grau hinterlegt sind.}
 
 %\noindent
+%Ein weitere Punkt ist auch die technische Speicherung. In einem einzelnen HDFS-Verzeichnis können maximal 1048576 Dateien gespeichert werden.\footnote{Siehe Konfiguration von \textit{dfs.namenode.fs-limits.max-directory-items}} Hingegen können in einem lokalen Verzeichnis eines ext4-Dateisystems deutlich mehr Dateien gespeichert werden. Dieser Wert kann maximal auf 6.400.000 gesetzt werden.\footnote{ Siehe \url{https://hadoop.apache.org/docs/r3.0.0/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml} Stand: 23.8.2018.} Wenn ein Dateisystem mehr Dateien in einem Verzeichnis speichert, müsste im HDFS ein zweites Verzeichnis zur Speicherung angelegt werden. Somit ist es auch technisch nicht möglich die gleiche logische Verzeichnisstruktur im HDFS aufzubauen. Bei dieser Variante können bei Bedarf wenigstens neue Verzeichnisse im HDFS angelegt werden! Bei dem Windows-Verzeichnis sind bereits 2000 Dateien größer 10 MB.
+
 %TODO: Siehe HBASE MOB (Medium-sized Object Binaries)
-TODO: Fazit der vor und nachteile aller varianten, um zu zeigen wie variante 2 besser als 1 ist und variante 3 besser als 2 wäre und variante 4 die beste variante ist!
 \section{Fachliche Probleme bei den Daten}
 
 \subsection{Symbolische Links}
@@ -439,3 +444,7 @@ sudo bindfs -u $(id -u) -g $(id -g) src_dir/ target_dir/
 Der Befehl selbst benötigt Root-Rechte. Jedoch kann der Nutzer danach alle Dateien des Zielverzeichnisses lesen. Der einzige Nachteil an dieser Lösung ist, dass der Besitzer und die Gruppe jeder einzelnen Datei nun der Nutzer des Analysesystems ist.\\
 Dieser Nachteil muss zukünftig behoben werden, damit die forensische Analyseplattform auch die Besitzer und Gruppen einer Datei korrekt auswerten kann.
 %Im Anhang beschreiben, wie bindfs gebaut werden kann.
+
+
+\section{Fazit zur Datenspeicherung} 
+Die vierte Variante überzeugt durch eine einfache Lösung und zur Speicherung von vielen kleinen und großen Dateien. Darüber hinaus kann mithilfe der HBASE-Datenbank auch eine kleine Fallverwaltung implementiert werden, um mehrere Asservat eines Falls zu importieren.\\ Die prototypische Implementierung bestätigt die Machbarkeit zur Speicherung von großen semi-strukturierten Datensätzen durch eine Kombination der Speicherung im HDFS und HBASE. Aufbauend auf dieser Implementierung und dem dargestellten Datenmodell können im nächsten Schritt der Datenverarbeitung weitere Metadaten extrahiert und gewonnen werden. 
