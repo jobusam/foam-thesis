@@ -1,4 +1,4 @@
-\chapter{Anhang A}
+\chapter{Allgemeines}
 
 \section{Analyse ähnlicher Projekte und Produkte}
 Im Bereich der IT-Sicherheit und Incident Response existiert für Unternehmensinfrastrukturen das Apache Projekt \textit{Metron}, welches auf dem Hadoop Framework aufbaut.\footnote{Siehe \url{https://metron.apache.org/} (Stand: 5.3.2018).}\\ Ziel dieses Projektes ist es Sicherheitsvorfälle zu finden und zu analysieren. Hierbei kann Apache Metron auch mit Telemetriedaten umgehen.\footnote{Siehe \url{https://www.heise.de/developer/meldung/Cybersecurity-Apache-Metron-wird-Top-Level-Projekt-3695901.html} (Stand: 5.3.2018)}\\
@@ -37,10 +37,16 @@ Nachfolgend werden die Logos aufgelistet, welche in Abbildung \ref{fig:hadoop_fr
 \end{itemize}
 
 
+\chapter{Datenimport}
+\section{Konfigurationsdateien}
+\label{sec:appendix_data_import_config_management}
+Nachfolgende Listings zeigen die minimale Konfigurationsdateien, welche beim Datenimport angegeben werden können. Diese werden genutzt um die Verbindung zum HDFS-Dateisystem und zur HBASE-Datenbank zu definieren.
+\lstinputlisting[label={lst:hdfs_core_xml},caption= Minimale Konfiguration der Datei \textit{hdfs-core.xml},captionpos=b,style=customshell]{resource/appendix/hdfs-core.xml}
 
+\lstinputlisting[label={lst:hbase_site_xml},caption= Minimale Konfiguration der Datei \textit{hbase-site.xml},captionpos=b,style=customshell]{resource/appendix/hbase-site.xml}
 
 
 %\chapter{Hadoop Konfigurationen}
 %\section{Aufsetzen des aktuellen Hadoop-Frameworks}
 %Listing \ref{lst:config_hadoop} zeigt die Schritte zum Konfigurieren des Hadoop-Frameworks
-%\lstinputlisting[label={lst:config_hadoop},caption= Konfiguration des Hadoop-Frameworks,captionpos=b,style=customshell]{resource/hadoop_configuration.txt}
+%\lstinputlisting[label={lst:config_hadoop},caption= Konfiguration des Hadoop-Frameworks,captionpos=b,style=customshell]{resource/appendix/hadoop_configuration.txt}
