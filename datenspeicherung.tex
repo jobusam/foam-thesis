@@ -248,10 +248,6 @@ Wie bereits beschrieben, kann das HDFS mit großen und kleinen Dateien umgehen. 
 \noindent
 Nun stellt sich die Frage, ob eine Million Dateien realistisch anzusehen sind und wie groß den kleine Dateien sind. Nachfolgende Abbildungen zeigen hier die Resultate einer Analyse der Dateigröße von diversen Datenträgerabbilder. Abbildung \ref{fig:file_size_c_amount} zeigt hier die kumulierte Häufigkeit der Dateien unterteilt in mehrere Dateikategorien. Diese Kategorien sind logarithmisch nach dem dekadischen Logarithmus aufgeteilt.\footnote{Hierbei wurde die Ergebnismenge der Kategorien linear interpoliert. Der Quellcode zur Berechnung dieser Diagramme wurde unter \url{https://github.com/jobusam/foam-data-analysis-ui} bereitgestellt. } Eine Kategorie beschreibt die Anzahl aller Dateien in einem Datenträgerabbild, welche kleiner als die Kategorie ist. Zum Beispiel existieren auf dem Datenträgerabbild des Windows Systems knapp 400.000 Dateien die kleiner 10 Kilobyte sind.\\
 
-%TODO !!!!!!!!!!!!!!!!!!!!!!!!!!
-% Diagramme anpassen! Für Kilo,Mega,Giga :1000 und nicht durch 1024!!!!!!!!!!!!!!
-%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- 
  \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{./resource/fileSize_cumulatedAmount.png}
@@ -262,11 +258,11 @@ Nun stellt sich die Frage, ob eine Million Dateien realistisch anzusehen sind un
 \noindent
 Nachfolgend werden die Testdaten beschrieben:
 \begin{itemize}
-\item Das \textit{Linux Client System} ist ungefähr 9 GB\footnote{Die Größenangaben entsprechen den reinen Rohdaten der Dateien. Verzeichnisse und Dateisystemmetadaten sind nicht inkludiert.} groß und enthält ein Ubuntu-Betriebsystem. Es wurde als Testdatenträgerabbild im Rahmen Masterthesis erstellt. Das Abbild enthält 150.229 Dateien.\footnote{Es handelt sich ausschließlich um Datendateien. Verzeichnisse, Symbolische Links und Spezielle Dateien wurden nicht berücksichtigt.}
-\item Das \textit{Linux Server System} ist ungefähr 51 GB groß und enthält ein CentOS-Betriebssystem. Das System ist ein Name Node eines kleinen Hadoop-Clusters. Das Abbild enthält 163.555 Dateien.
-\item Das \textit{Windows System} ist ungefähr 207 GB groß und ist ein reales Nutzersystem, welches seit mehreren Monaten eingesetzt wird. Das Abbild enthält 624.650 Dateien.
-\item Der \textit{NAS Datenspeicher} entspricht einem QNAP-System mit ungefähr 257 GB an realen Rohdaten. Hierbei ist auf dem Datenträgerabbild kein Betriebssystem installiert. Es handelt sich hauptsächlich um Dokumente und Mediendateien. Das Abbild enthält 46.215 Dateien.
-\item Die \textit{Externe Festplatte} mit ungefähre 90 GB Daten, wird als Backup für diverse Mediendateien genutzt. Das Abbild enthält 67.809 Dateien.
+\item Das \textit{Linux Client System} ist ungefähr 10 GB\footnote{Die Größenangaben entsprechen den reinen Rohdaten der Dateien. Verzeichnisse und Dateisystemmetadaten sind nicht inkludiert.} groß und enthält ein Ubuntu-Betriebsystem. Es wurde als Testdatenträgerabbild im Rahmen Masterthesis erstellt. Das Abbild enthält 150.229 Dateien.\footnote{Es handelt sich ausschließlich um Datendateien. Verzeichnisse, Symbolische Links und Spezielle Dateien wurden nicht berücksichtigt.}
+\item Das \textit{Linux Server System} ist ungefähr 55 GB groß und enthält ein CentOS-Betriebssystem. Das System ist ein Name Node eines kleinen Hadoop-Clusters. Das Abbild enthält 163.555 Dateien.
+\item Das \textit{Windows System} ist ungefähr 222 GB groß und ist ein reales Nutzersystem, welches seit mehreren Monaten eingesetzt wird. Das Abbild enthält 624.650 Dateien.
+\item Der \textit{NAS Datenspeicher} entspricht einem QNAP-System mit ungefähr 266 GB an realen Rohdaten. Hierbei ist auf dem Datenträgerabbild kein Betriebssystem installiert. Es handelt sich hauptsächlich um Dokumente und Mediendateien. Das Abbild enthält 46.215 Dateien.
+\item Die \textit{Externe Festplatte} mit ungefähre 95 GB Daten, wird als Backup für diverse Mediendateien genutzt. Das Abbild enthält 67.809 Dateien.
 \end{itemize}
 
 \noindent
@@ -283,7 +279,7 @@ Da die forensische Analyseplattform mehrere Datenträgerabbilder speichern kann,
 Anhand der relativierten kumulativen Häufigkeit aus Abbildung \ref{fig:file_size_r_c_amount} wird klar, dass fast 80-90 \% der Dateien kleiner 100 Kilobyte sind und mehr als 95\% der Dateien kleiner 10 Megabyte sind. Allerdings sind diese Angaben mit Vorsicht zu genießen, denn je nach Anwendungsfall können Datenträger beliebige Dateien unterschiedlicher Größe speichern. Ist beispielsweise ein Betriebssystem auf dem Datenträger installiert, existieren allein durch das Betriebssystem tausende von Dateien mit minimaler Dateigröße. Umgekehrt enthält das Datenträgerabbild des NAS-Datenspeichers sehr viele Dateien zwischen 1 und 10 MB. Dies liegt daran, dass von den 46.215 Dateien ungefähr 30.000 Dateien Fotos sind. Diese wiederum sind für gewöhnlich 500 Kilobyte bis 10 Megabyte groß. Die Kurve könnte allerdings anders aussehen, wenn beispielsweise auch Filme und Videos auf dem NAS gespeichert wären.\\
 
 \noindent
-Die nachfolgende Abbildung \ref{fig:file_size_c_file_size} und die Abbildung \ref{fig:file_size_r_c_file_size} zeigen die absolute und relativierte kumulative Kategoriegröße der einzelnen Kategorien an. Die Kategoriegröße beschreibt die Gesamtgröße aller Dateien einer spezifischen Kategorie. Beispielsweise sind bei dem Windows System ungefähr 80 Gigabyte der Gesamtdatengröße in Dateien kleiner 10 Megabyte gespeichert.\\  
+Die nachfolgende Abbildung \ref{fig:file_size_c_file_size} und die Abbildung \ref{fig:file_size_r_c_file_size} zeigen die absolute und relativierte kumulative Kategoriegröße der einzelnen Kategorien an. Die Kategoriegröße beschreibt die Gesamtgröße aller Dateien einer spezifischen Kategorie. Beispielsweise sind bei dem Windows System ungefähr 90 Gigabyte der Gesamtdatengröße in Dateien kleiner 10 Megabyte gespeichert.\\  
 
  \begin{figure}[ht]
   \centering
@@ -307,6 +303,7 @@ Anhand der Diagramme empfiehlt es sich den Grenzwert der Dateigröße zwischen 1
 \end{figure}
 
 \subsection{Anwendungsimplementierung} 
+\label{subsec:data_import_implementation}
 
 Die Variante zu Datenspeicherung im HDFS-Dateisystem und der HBASE-Datenbank wurde im Rahmen dieser Thesis implementiert. Das GitHub-Projekt \textit{foam-data-import} enthält diese Anwendung.\footnote{Siehe \url{https://github.com/jobusam/foam-data-import}.} Abbildung \ref{fig:data_import} skizziert die Datenaufbereitung und Speicherung in HBASE und im HDFS.\\
 \begin{figure}[ht]
@@ -391,60 +388,65 @@ Bei der anschließenden Datenverarbeitung in Kapitel \ref{ch:data_processing} wi
 %Ein weitere Punkt ist auch die technische Speicherung. In einem einzelnen HDFS-Verzeichnis können maximal 1048576 Dateien gespeichert werden.\footnote{Siehe Konfiguration von \textit{dfs.namenode.fs-limits.max-directory-items}} Hingegen können in einem lokalen Verzeichnis eines ext4-Dateisystems deutlich mehr Dateien gespeichert werden. Dieser Wert kann maximal auf 6.400.000 gesetzt werden.\footnote{ Siehe \url{https://hadoop.apache.org/docs/r3.0.0/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml} Stand: 23.8.2018.} Wenn ein Dateisystem mehr Dateien in einem Verzeichnis speichert, müsste im HDFS ein zweites Verzeichnis zur Speicherung angelegt werden. Somit ist es auch technisch nicht möglich die gleiche logische Verzeichnisstruktur im HDFS aufzubauen. Bei dieser Variante können bei Bedarf wenigstens neue Verzeichnisse im HDFS angelegt werden! Bei dem Windows-Verzeichnis sind bereits 2000 Dateien größer 10 MB.
 
 %TODO: Siehe HBASE MOB (Medium-sized Object Binaries)
-\section{Fachliche Probleme bei den Daten}
+\subsection{Datenspezifische Aspekte}
+Bei der Implementierung des Datenimports müssen auch datenspezifische Aspekte berücksichtigt werden. Wie bereits erwähnt werden die Daten auf logischer Dateiebene in das Hadoop-System importiert. Hierbei müssen spezielle Dateitypen berücksichtigt werden. Ein Beispiel ist die Verarbeitung von symbolischen Links, welche gerade unter Linux-basierten Betriebssystemen beziehungsweise in der EXT-Dateisystemfamilie auftreten können. Denn wenn symbolische Links in einem Dateisystem gespeichert werden und letzteres im Analysesystem gemountet wird, so können diese Links auch auf Dateien außerhalb des Dateisystems verweisen. Denn letztlich interpretiert das Betriebssystem diese symbolischen Links. Bei der forensischen Analyse könnte diese  Interpretation aber zu schwerwiegenden Fehlern der Analyseergebnisse führen, wenn beispielsweise Inhalte des Analyserechners verarbeitet werden, welche ursprünglich nicht auf dem Asservat vorhanden waren. Daher muss beim Import geprüft werden, ob die Datei einem symbolischen Link entspricht. Ist dies der Fall darf, der symbolische Link nur innerhalb des Asservats interpretiert werden.\footnote{Derzeit werden logische Links in das System importiert. Jedoch wird ihre Referenz aktuell beim Import nicht interpretiert. Dies wäre bei einer Weiterentwicklung des System durchaus sinnvoll.} \\
 
-\subsection{Symbolische Links}
-Es gibt einige Hürden beim Importieren der Datenträger in das HDFS. Wie bereits erwähnt werden die Daten auf logischer Dateiebene in das Hadoop-System importiert. Hierbei müssen spezielle Dateitypen berücksichtigt werden. Ein Beispiel ist die Verarbeitung von symbolischen Links, welche gerade unter Linux-basierten Betriebssystemen beziehungsweise in der EXT-Dateisystemfamilie auftreten können. Denn wenn symbolische Links in einem Dateisystem gespeichert werden und letzteres im Analysesystem gemountet wird, so können diese Links auch auf Dateien außerhalb des Dateisystems verweisen. Denn letztlich interpretiert das Betriebssystem diese symbolischen Links. Bei der forensischen Analyse könnte diese aber zu schwerwiegenden Fehlern der Analyseergebnisse führen, wenn beispielsweise Inhalte des Analyserechners verarbeitet werden, welche ursprünglich nicht auf dem Asservat vorhanden waren. Daher muss beim Import auf geprüft werden, ob die Datei einem symbolischen Link entspricht. Ist dies der Fall darf, der symbolische Link nicht interpretiert werden. 
+\noindent
+Auch beim NTFS-Dateisystem, welches vorzugsweise bei Windows genutzt wird, existieren spezielle Eigenschaften. Bei NTFS ist es möglich an Datendateien und sogar an Verzeichnissen sogenannte \textit{Alternate Data Streams} anzuhängen. Diese können, wie jede andere Datei, beliebige Binärdaten enthalten.\footnote{Auch diese Eigenschaften werden im Rahmen dieser Thesis noch nicht beim Datenimport berücksichtigt.}\\
 
-\subsection{Zugriffsrechte}
+\noindent
+Ein weiterer Punkt sind auch die Zeitstempel. Das System kann letztlich die Zeitstempel zur Erstellung einer Datei (\textit{created}), zur letzten Modifikation einer Datei (\textit{lastModified}), zur letzten Modifikation der Metadaten einer Datei (\textit{lastChanged}) und zum letzten Lesezugriff einer Datei (\textit{lastAccessed}) speichern. Letztlich hängt es aber sehr stark von dem genutzten Dateisystem und auch sogar von dem Betriebssystem ab, welche Zeitstempel überhaupt geschrieben werden. Noch kritischer muss die Korrektheit der Daten geprüft werden. Derzeit liest die Datenimport-Anwendung diese Zeitstempel aus, falls sie vorhanden sind.\\
+
+\noindent
+Analog zu diesen beschriebenen Fällen gibt es noch weitere dateisystemspezifische Eigenschaften, welche beim Datenimport und zukünftigen Weiterentwicklungen berücksichtigt werden sollten. 
+
+\subsection{Zugriffs und Ausführungsrechte}
 \label{subsec:data_import_access_rights}
-Ein weiterer Aspekt ist die Beschränkung der Dateizugriffe auf Basis der vorgegebenen Zugriffsrechte. Angenommen es wird ein Datenträgerabbild auf einem Analysesystem gemountet.
-Dann kann dies im Normalfall nur mit Root-Rechten durchgeführt werden. 
-Der forensische Analyse benötigt also zumindest auf seinem Analyse-Rechner 
-privilegierte Ausführungsrechte.\\
-Beim Import von Dateien auf eben diesem gemounteten Dateisystem des Datenträgerabbildes sind jedoch die Dateizugriffsrechte weitaus interessanter. Denn das Analyse-Betriebssystem berücksichtigt diese Zugriffsrechte. Während diese Problematik beispielsweise bei NTFS-Dateisystemen eine untergeordnete Rolle spielt, so werden hingegen bei EXT-Dateisystemen die Unix-Dateirechte gespeichert und auch auf dem Analysesystem interpretiert. 
+Ein weiterer Aspekt ist die Beschränkung der Dateizugriffe auf Basis der vorgegebenen Zugriffsrechte. Wie in Abbildung \ref{fig:data_import} in Kapitel \ref{subsec:data_import_implementation} beschrieben wird, muss im ersten Schritt das Datenträgerabbild (beziehungsweise das Asservat) zuerst auf dem Analyserechner gemountet werden. Unter Linux kann dies im Normalfall nur mit erhöhten Administrator-Rechten (root) durchgeführt werden. Der forensische Analyst benötigt also zumindest auf seinem Analyse-Rechner privilegierte Ausführungsrechte.\\
+Hier unterscheidet sich beispielsweise die Referenzanalysesoftware \textit{Autopsy} von dieser forensischen Analyseplattform. Denn bei Autopsy unter Windows wird das Dateisystem auf Anwendungsebene direkt mit der Software analysiert. Das Betriebssystem selbst muss das Dateisystem nicht mounten und der Nutzer benötigt daher auch keine besonderen Systemprivilegien.\\
+
+\noindent
+Beim Import von Dateien auf eben diesem gemounteten Dateisystem des Datenträgerabbildes sind jedoch die Dateizugriffsrechte weitaus interessanter. Denn das Betriebssystem des Analyse-Rechners berücksichtigt diese Zugriffsrechte. Während diese Problematik beispielsweise bei NTFS-Dateisystemen eine untergeordnete Rolle spielt, so werden hingegen bei EXT-Dateisystemen die Unix-Dateirechte gespeichert und auch auf dem Analysesystem interpretiert. 
 Daher kann der Nutzer und dessen ausgeführte Programme, welche die Daten aus dem Dateisystem auslesen, nicht in allen Fällen auf alle Dateien zugreifen.\\
 
 \noindent
-Die einfachste Möglichkeit um die Problematik der Zugriffsrechte zu umgehen, wäre das Ausführen der Datenimport-Applikation mit Root-Rechten. Andererseits sollte die Datenimport-Applikation aber nicht mit Root-Rechten ausgestattet werden, da dies zu Sicherheitslücken und unvorhergesehenen Rechteausweitungen im Fehlerfall führen könnte. Darüber hinaus kann bei einem Fehlverhalten der Anwendung das Analysesystem beschädigt werden. \\
-Letztlich braucht die Anwendung zum Datenimport nur die Berechtigungen zum Lesen von Dateien mit Root-Rechten. Dies würde dem \textit{Need-to-know-Prinzip} genügen.\\
-%(TODO: verweis auf s. 42 M106)
+Die einfachste Möglichkeit um die Problematik der Zugriffsrechte zu umgehen, wäre das Ausführen der Datenimport-Applikation mit Root-Rechten. Andererseits sollte die Applikation nicht mit Root-Rechten ausgestattet werden, da dies im Fehlerfall zu unvorhergesehenen Rechteausweitungen führen könnte und ein Sicherheitsrisiko für Systemintegrität darstellen würde. Darüber hinaus kann bei einem Fehlverhalten der Anwendung das Analysesystem beschädigt werden. Letztlich braucht die Anwendung zum Datenimport nur die Berechtigungen zum Lesen von Dateien innerhalb des gemounteten Verzeichnisses unabhängig von deren Besitzer und Zugriffsrechten.\\
 
 \noindent
-Eigentlich müsste beim Mounten des Dateisystems dem Betriebssystem mitgeteilt werden können, dass die Dateirechte des gemounteten Dateisystems ignoriert werden sollen. Diese Option ist aber nicht möglich\footnote{Zumindest konnte keine funktionierende Variante gefunden werden (siehe Man-Page des Mount-Befehls.}.\\
+Eigentlich müsste beim Mounten des Dateisystems dem Betriebssystem mitgeteilt werden können, dass die Dateirechte des gemounteten Dateisystems ignoriert werden sollen. Diese Option ist aber nicht möglich\footnote{Zumindest konnte keine funktionierende Variante gefunden werden. Siehe Man-Page des Mount-Befehls (geprüft unter Fedora 28).}.\\
 Eine weitere Alternative wäre die Möglichkeit mit Access Control Lists (ACL) zu arbeiten und dem nichtprivilegiertem Nutzer Rechte zum Lesen der Dateien zu geben. Oder umgekehrt alle Dateien dem nichtprivilegierten Nutzer zuzordnen, welcher wiederum den Datenimport startet.
 Hierzu müsste die Datenträgerkopie schreibend gemountet werden, damit die Rechte jeder Datei angepasst werden können. Dies würde wiederum dazu führen, dass das Datenträgerabbild als sichergestelltes Asservat geändert werden würde. 
 Daher ist diese Lösung auch nicht geeignet.\\
 
 \noindent
-Eine weitere Alternative ist die Nutzung von Posix Capabilities\footnote{Siehe Manpages mit folgendem Befehl: \textit{ man 7 capabilities}.}.
-Dies scheint unter CentOS/Fedora wohl die beste Variante zu sein. Zum Lesenden Zugriff auf Dateien müsste die Posix Capability \textit{CAP\_DAC\_READ\_SEARCH} gesetzt werden.\\
-Mit nachfolgenden Kommando könnte diese Capability dem Analyseprogramm gesetzt werden.
-Damit könnte dann auch ein nicht-privilegierte Nutzer lesenden Zugriff auf privilegierte Dateien erhalten.\\ 
+Eine andere Alternative ist die Nutzung von Posix Capabilities\footnote{Siehe Manpages mit folgendem Befehl: \textit{ man 7 capabilities}.}. Dies Variante ist prinzipiell unter CentOS/Fedora möglich. Zum Lesenden Zugriff auf Dateien muss die Posix Capability \textit{CAP\_DAC\_READ\_SEARCH} gesetzt werden.\\
+Mit nachfolgenden Kommando kann diese Capability für das Analyseprogramm gesetzt werden.
+Damit kann theoretisch auch ein nicht-privilegierter Nutzer lesenden Zugriff auf privilegierte Dateien erhalten.\\ 
 
 \begin{lstlisting}[label={lst:pos_cap_command},caption= Befehl zum Setzen von Posix Capabilities,captionpos=b,frame=single,style=customshell]
-setcap CAP_DAC_READ_SEARCH /bin/forensic_import
+setcap CAP_DAC_READ_SEARCH /bin/data.import
 \end{lstlisting}
 % Mit oder ohne + eip???
 %setcap CAP\_DAC\_READ\_SEARCH+eip /bin/ping
 
 \noindent
-Allerdings funktioniert diese Art hauptsächlich bei Binärprogrammen aber nicht bei Shell-Skripten oder Java-Anwendungen. Ein ähnliche Alternative zu Posix Capabilities ist das Setzen des SUID-Bits als Unix-Dateirecht für die Programmdatei. Aber auch gilt wieder, dass dies für Binärprogramme funktioniert aber nicht für interpretierte Skripte oder Java-Anwendungen, welche wiederum in der Java Virtual Machine laufen.
+Allerdings funktioniert diese Art hauptsächlich bei Binärprogrammen jedoch nicht bei Shell-Skripten oder Java-Anwendungen.\\
+Ein ähnliche Alternative zu den Posix Capabilities ist das Setzen des SUID-Bits als Unix-Dateirecht für die Programmdatei. Aber auch diese Möglichkeit funktioniert nur bei Binärprogrammen und nicht für interpretierte Skripte oder Java-Anwendungen, die wiederum in der Java Virtual Machine ausgeführt werden.\\
 %Setzen des Flags
 %chmod u-s /bin/ping
 
-Die Nutzung von SELINUX empfiehlt sich hier auch nicht. SELINUX ist eine Erweiterung des Linux-Kernels um detaillierte Zugriffskontrollen zu setzen. Diese Erweiterung ermöglicht eine detaillierte Definition, welche Anwendung oder Nutzer auf einzelne Dateien zugreifen dürfen. Allerdings werden auch unter SELINUX immer zuerst die Unix-Dateirechte und zusätzlich die in SELINUX definierten Zugriffskontrollen geprüft. Daher kann auch mit SELINUX das Problem nicht behoben werden.\\
-
 \noindent
 Zuletzt gibt es noch eine Variante, welche die Problematik mit den Dateirechten lösen kann. 
-Mit dem Projekt \textit{bindfs}\footnote{Siehe \url{https://bindfs.org/}.} können unter Linux Dateisystemverzeichnisse neu gemountet werden und ihre Zugriffsrechte verändert werden. Der nachfolgende Befehl mountet das existierende Verzeichnis mit den enthaltenden Dateien in einem neuen Verzeichnis und setzt beispielsweise bei jeder Datei die aktuelle ID des Nutzers als Datei-Owner und Group. 
+Mit dem Projekt \textit{bindfs}\footnote{Siehe \url{https://bindfs.org/}.} können unter Linux Dateisystemverzeichnisse neu gemountet werden und ihre Zugriffsrechte verändert werden. Der nachfolgende Befehl mountet das existierende Verzeichnis mit den enthaltenen Dateien in einem neuen Verzeichnis und setzt bei jeder Datei die aktuelle ID des Nutzers als Datei-Owner und Group. 
 \begin{lstlisting}[label={lst:bindfs_command},caption= Nutzung von Bindfs zum Ändern von Dateirechten,captionpos=b,frame=single,style=customshell]
 sudo bindfs -u $(id -u) -g $(id -g) src_dir/ target_dir/
 \end{lstlisting}
-Der Befehl selbst benötigt Root-Rechte. Jedoch kann der Nutzer danach alle Dateien des Zielverzeichnisses lesen. Der einzige Nachteil an dieser Lösung ist, dass der Besitzer und die Gruppe jeder einzelnen Datei nun der Nutzer des Analysesystems ist.\\
-Dieser Nachteil muss zukünftig behoben werden, damit die forensische Analyseplattform auch die Besitzer und Gruppen einer Datei korrekt auswerten kann.
-%Im Anhang beschreiben, wie bindfs gebaut werden kann.
+Der Befehl selbst benötigt Root-Rechte. Jedoch kann der Nutzer danach alle Dateien des Zielverzeichnisses lesen. Der einzige Nachteil an dieser Lösung ist, dass der Besitzer und die Gruppe jeder einzelnen Datei nun von dem Nutzer des Analysesystems überschrieben wurde.
+Dies bedeutet, dass die Attribute \textit{Owner} und \textit{Group} im Datenmodell der forensischen Analyseplattform derzeit nicht korrekt sind und daher auch nicht zur Datenverarbeitung genutzt werden können. Dieser Nachteil muss zukünftig behoben werden, damit die forensische Analyseplattform auch die Besitzer und Gruppen einer Datei korrekt auswerten kann.
+Beispielsweise könnte untersucht werden, ob die Implementierung von BindFS modifiziert werden kann, um den ursprünglichen Nutzer und die Gruppe möglicherweise als erweiterte Dateiattribute zu speichern. Diese erweiterten Dateiattribute könnten dann wieder beim Datenimport ausgelesen werden.\\
+Alternativ könnte nach weiteren Möglichkeiten gesucht werden, wie dem Betriebssystem
+mitgeteilt werden kann, die Dateirechte für bestimmte gemountete Datenträger bei einem lesenden Zugriff zu ignorieren.
 
-
-\section{Fazit zur Datenspeicherung} 
+%TODO Im Anhang beschreiben, wie bindfs gebaut werden kann.
+\subsection{Fazit} 
 Die vierte Variante überzeugt durch eine einfache Lösung und zur Speicherung von vielen kleinen und großen Dateien. Darüber hinaus kann mithilfe der HBASE-Datenbank auch eine kleine Fallverwaltung implementiert werden, um mehrere Asservat eines Falls zu importieren.\\ Die prototypische Implementierung bestätigt die Machbarkeit zur Speicherung von großen semi-strukturierten Datensätzen durch eine Kombination der Speicherung im HDFS und HBASE. Aufbauend auf dieser Implementierung und dem dargestellten Datenmodell können im nächsten Schritt der Datenverarbeitung weitere Metadaten extrahiert und gewonnen werden. 
