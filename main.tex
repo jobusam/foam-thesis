@@ -17,11 +17,9 @@
 \usepackage{caption} %for logos and tables and figures
 \usepackage{csvsimple} % for creating tables from csv file
 \usepackage{subcaption} %for logos
-\usepackage{listings} % used for source code listings
-\usepackage[svgnames]{xcolor} % color is used for background color in listings
 
-%PassOptions with hyphens is used to correctly set line breaks on long urls. The url package is internally loaded by hyperref package!
-\PassOptionsToPackage{hyphens}{url}\usepackage[colorlinks=true, linkcolor=Black,citecolor=Black,urlcolor=MidnightBlue]{hyperref} % for urls and hyperrefs -> use linkcolor to set a proper value for all links like DarkBlue or DarkGreen
+%-----------------------------------------------------
+\usepackage{listings} % used for source code listings
 \lstdefinestyle{customc}{
   belowcaptionskip=1\baselineskip,
   breaklines=true,
@@ -62,6 +60,12 @@
   xleftmargin=2.5em,
   framexleftmargin=2.5em
 }
+%-----------------------------------------------------
+
+\usepackage[svgnames]{xcolor} % color is used for background color in listings
+
+%PassOptions with hyphens is used to correctly set line breaks on long urls. The url package is internally loaded by hyperref package!
+\PassOptionsToPackage{hyphens}{url}\usepackage[colorlinks=true, linkcolor=Black,citecolor=Black,urlcolor=MidnightBlue]{hyperref} % for urls and hyperrefs -> use linkcolor to set a proper value for all links like DarkBlue or DarkGreen
 
 %define new chapter format!
 \usepackage{titlesec}
@@ -72,6 +76,14 @@
 \usepackage{csquotes} % Recommended for biblatex in combination with babel
 \usepackage[backend=biber,style=numeric,sorting=ynt]{biblatex}
 \addbibresource{references.bib}
+
+%use glossaries package to create an acronym listing
+\usepackage[nonumberlist,nopostdot]{glossaries}
+\makeglossaries % create makeindex files to sort acronyms. see glossaries package
+\setacronymstyle{long-short}
+\loadglsentries{acronyms}
+
+%--------Start with document --------------------------------------------------------
 
 \author{Johannes Busam}
 \title{Masterthesis}
@@ -154,6 +166,14 @@ Zweitbetreuung: ...\\
 \listoffigures
 \listoftables
 \lstlistoflistings
+
+\printglossary[title={Abkürzungsverzeichnis}] % list all acronyms
+%---------------------------------------------------
+
+
+
+
+
 %---------------------------------------------------
 \appendix
 

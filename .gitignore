@@ -5,6 +5,13 @@ logos/
 *.log
 
 #Latex temp files
+main.acn
+main.acr
+main.alg
+main.glg
+main.glo
+main.gls
+main.ist
 main.aux
 main.bbl
 main.bcf
