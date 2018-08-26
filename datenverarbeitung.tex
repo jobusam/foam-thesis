@@ -1,5 +1,6 @@
 \chapter{Datenverarbeitung}
 \label{ch:data_processing}
+TODO: Dieses Kapitel muss noch geschrieben werden. Der Umfang sollte circa 15 Seiten umfassen.
 
 \section{Herkömmliches Analysevorgehen}
 \label{sec:common_analysis_approach_part2}
@@ -18,14 +19,15 @@ Diese Module beschreiben letztlich die Funktionalität die Autopsy zur automatis
 
 Folgende Module sind verfügbar\footnote{Siehe auch \url{http://sleuthkit.org/autopsy/docs/user-docs/4.3/} Stand: 09.08.2018}
 \begin{itemize}
-\item TEst
+\item Modul 1
+\item Modul 2
 \end{itemize}
 
 \noindent
 Interessanterweise basiert Schlüsselwort-Suche bei Autopsy auch auf Apache Solr. Jedoch hierbei natürlich keine Solr-Cloud genutzt sondern nur eine einfache lokale Installation.
 
-\section{Verarbeitung Apache Spark\texttrademark}
-Der physikalische Aufbau wurde bereits im Grundlagenkapitel zu Apach Spark behandelt (siehe Kapitel \ref{sec:theory_spark}). In diesem Kapitel sollen primär die Algorithmen und die Verarbeitung der Daten aus logischer Sicht betrachtet.\\ 
+\section{Verarbeitung Apache Spark}
+Der physikalische Aufbau wurde bereits im Grundlagenkapitel zu Apach Spark\texttrademark behandelt (siehe Kapitel \ref{sec:theory_spark}). In diesem Kapitel sollen primär die Algorithmen und die Verarbeitung der Daten aus logischer Sicht betrachtet.\\ 
 
 \noindent
 Bei Apache Spark gibt es seit der Version 2.0.0 diverse APIs, wie Daten geladen werden können. Es besteht die Möglichkeit Daten mithilfe von Resilient Distributed Datasets (RDDs) zu laden und zu verarbeiten. Aufbauend auf diesen RDDs können, die Daten gemappt, gefilter oder aggregiert werden. Dies Möglichkeit gibt es schon immer in Apache Spark. Seit der Version 2.0.0 gibt es nun auch DataFrames und DataSets (TODO: gibt es beides erst seit v2.0?). Diese Datenstrukturen beschreiben eher eine Schnittstelle aus Sicht von Tabellen. Die Implementierung dieser Typen baut wieder auf den RDDs auf. Doch welche Strukturen eignen sich für die Anwendungsfälle in dieser Thesis? \\
@@ -103,5 +105,9 @@ Abbildung \ref{fig:hbase_solr_indexing} stellt die physikalische Aufteilung mit 
   \label{fig:hbase_solr_indexing}
 \end{figure}
 
-\subsubsection{Elasticsearch}
-Spark-Connector auf RDD-Basis vorhanden. Kerberos-Sicherung nur über X-Pack gegen Geld vorhanden. Rack-Awareness und Verteilung nicht klar. Elasticsearch baut eigene Infrastruktur auf. Nicht über Ambari steuerbar.
+%TODO : Vergleich zu Elasticsearch!
+%Spark-Connector auf RDD-Basis vorhanden. Kerberos-Sicherung nur über X-Pack gegen Geld vorhanden. Rack-Awareness und Verteilung nicht klar. Elasticsearch baut eigene Infrastruktur auf. Nicht über Ambari steuerbar.
+
+\section{Leistungsanalyse}
+TODO: Geschwindigkeit und Ressourcenverbrauch analysieren. Hierzu gehört auch die Performanz beim Datenimport! Maximal 3 Seiten.
+
