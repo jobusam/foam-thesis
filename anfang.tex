@@ -2,21 +2,21 @@
 %
 \section*{Kurzfassung}
 %Deutsch
-Die digitale Forensik ist heutzutage ein wichtiger Teil bei der Aufklärung von Straftaten durch Ermittlungsbehörden. Nahezu in jedem Fall können digitale Beweismittel sichergestellt werden, weil informationstechnische Systeme im Alltag allgegenwärtig sind. Durch den rasanten Fortschritt von IT-Technologien, müssen auch die forensische Methoden immer wieder neu adaptiert und verbessert werden. Allein die Datenmenge, welche durch Mobiltelefone, Computer, Netzwerkspeicher und Server zusammenkommt kann durch aus im Terabyte-Bereich liegen.\\
+Die digitale Forensik ist heutzutage ein wichtiger Teil bei der Aufklärung von Straftaten durch Ermittlungsbehörden. Nahezu in jedem Fall können digitale Beweismittel sichergestellt werden, weil informationstechnische Systeme im Alltag allgegenwärtig sind. Durch den rasanten Fortschritt von IT-Technologien, müssen auch die forensische Methoden immer wieder neu adaptiert und verbessert werden. Allein die Datenmenge, welche durch Mobiltelefone, Computer, Netzwerkspeicher und Server zusammenkommt kann durchaus im Terabyte-Bereich liegen.\\
 
 \noindent
 Um solche Datenmengen schnell und effizient bearbeiten zu können, wird in dieser Thesis eine forensische Analyseplattform entwickelt. Sie soll anfallende Daten parallelisiert in einem Computer-Cluster speichern und aufbereiten können. Zuerst soll geprüft werden, wie diese Daten verteilt gespeichert werden können. Im nächsten Schritt sollen, aufbauend auf dem existierenden Datenbestand, neue Informationen extrahiert werden können. Hierbei sollen auch forensische Aspekte, wie beispielsweise die Erstellung einer Beweismittelkette und die Sicherheit des Computer-Clusters betrachtet werden.\\
 
 \noindent
-Zur Datenspeicherung soll das bekannte Apache Hadoop\textsuperscript{\textregistered}-Ökosystem genutzt werden. Als Ausgangslage werden mehrere Datenträgerabbilder analysiert. Hierbei zeigt sich schnell, dass diese Abbilder nicht direkt in die Analyseplattform importiert werden können, da sonst keine parallele Verarbeitung möglich wäre. In einer weiteren Variante werden die Daten auf logischer Dateiebene, Datei für Datei, in die Analyseplattform importiert. Aber auch dieser Ansatz hat Schwächen, da die originalen Dateimetadaten nicht performant gespeichert werden können.\\
-Die finale Variante zur Datenspeicherung ist eine Mischung von zwei Datenspeicherungen. So werden die Dateimetadaten und kleine Dateien in der spaltenorientierten Datenbank gespeichert. Wohingegen große Dateien im verteilten Dateisystem der Hadoop-Plattform abgelegt werden. Damit ist es auch möglich extrahierte Informationen aus den bestehenden Daten in der Datenbank abzuspeichern.\\
+Zur Datenspeicherung soll das Apache Hadoop\textsuperscript{\textregistered}-Ökosystem genutzt werden. Als Ausgangslage werden mehrere Datenträgerabbilder analysiert. Hierbei zeigt sich schnell, dass diese Abbilder nicht direkt in die Analyseplattform importiert werden können, da sonst keine parallele Verarbeitung möglich wäre. In einer weiteren Variante werden die Daten auf logischer Dateiebene, Datei für Datei, in die Analyseplattform importiert. Aber auch dieser Ansatz hat Schwächen, da die originalen Dateimetadaten nicht performant gespeichert werden können.\\
+Die finale Variante zur Datenspeicherung ist eine Mischung von zwei Datenspeicherungen. So werden die Dateimetadaten und kleine Dateien in einer spaltenorientierten Datenbank gespeichert. Wohingegen große Dateien im verteilten Dateisystem der Hadoop-Plattform abgelegt werden. Damit ist es auch möglich extrahierte Informationen aus den bestehenden Daten in der Datenbank abzuspeichern.\\
 
 \noindent
 Bei der Datenverarbeitung wird Apache Spark genutzt, welches die Daten auf der Hadoop-Plattform parallel prozessieren kann. Es werden beispielsweise Hashsummen berechnet und Medientypen ermittelt.\\
 Ein weiterer Aspekt in diesem Kontext ist die Implementierung einer Volltextsuche, zum performanten Zugriff der Daten. Hierzu werden die Daten im Computer-Cluster verteilt indexiert, um sie schneller durchsuchen zu können.\\
 
 \noindent
-
+Letztlich ist es möglich beliebige Datenträger mit der hier entwickelten forensischen Analyseplattform zu verarbeiten. Auch ein performanter Zugriff auf die Daten ist möglich. Allerdings gibt es auch Schwächen dieser Plattform, welch zukünftig behoben werden sollen. So benötigt allein das Importieren großer Datenträger in das Analysesystem zu viel Zeit. Hier wäre es sinnvoll die Datenverarbeitung so umzustellen, dass einzelne Daten sofort prozessiert und angezeigt werden, um damit schon auf Teilergebnisse zugreifen zu können.
 
 
 \newpage
