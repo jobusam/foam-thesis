@@ -129,29 +129,24 @@ Das Ermitteln der Medientypen macht gerade bei der Datenvisualisierung Sinn, da 
 Um auf die Daten in der forensischen Analyseplattform einfach zugreifen zu können, wäre eine Volltextsuche sinnvoll. Diese sollte performant arbeiten, damit Ergebnisse zu Suchanfragen von beliebigen Schlüsselwörtern in Realzeit angezeigt werden können. Um dies zu ermöglichen, können die Dateiinhalte und Metadaten indexiert werden.\\
 
 \noindent 
-Es gibt hierzu zwei mögliche Open-Source Projekte, die eine Datenindexierung anbieten. Dies sind \textit{Apache Solr\texttrademark} und Elasticsearch\texttrademark. Beide bieten eine Indexierung auf Basis von Apache Lucene an. Apache Solr wurde bereits im Grundlagenkapitel \ref{sec:theory_solr} beschrieben. Beide Projekte bieten einen ähnlichen Funktionsumfang. Im Rahmen dieser Thesis wird jedoch Apache Solr aus nachfolgenden Gründen genutzt.\\
+Es gibt hierzu zwei mögliche Open-Source Projekte, die eine Datenindexierung anbieten. Dies sind \textit{Apache Solr\texttrademark} und Elasticsearch\texttrademark. Beide bieten eine Indexierung auf Basis von Apache Lucene an. Apache Solr und Apache Lucene werden im Grundlagenkapitel \ref{sec:theory_solr} beschrieben. Solr und Elasticsearch bieten einen ähnlichen Funktionsumfang. Im Rahmen dieser Thesis wird jedoch Apache Solr aus nachfolgenden Gründen genutzt.\\
 Apache Solr bietet einen Cloud-Modus an und nutzt Apache Zookeeper, um die einzelnen Instanzen zu koordinieren. Für Apache Solr existiert bereits eine Integration in das Hadoop-Framework und die hier verwendete \textit{Hortonworks Data Platform}.\footnote{Siehe Link: \url{https://docs.hortonworks.com/HDPDocuments/HDPS/HDPS-3.0.0/bk_solr-search-installation/content/ch_hdp-search.html}. Letzter Stand: 9.9.2018.}\\
-Elasticsearch bietet auch einen Cloud-Modus und ist horizontal skalierbar. Allerdings wird ein eigener Mechanismus dafür genutzt und es existiert für die \textit{Hortonworks Data Platform} kein Installationspaket zur Nutzung von Elasticsearch im Hadoop-Umfeld. Dies bedeutet, dass Elasticsearch eigenständig im Computer-Cluster ausgerollt und überwacht werden muss.\\
-Ein weiterer Punkt ist die Absicherung der Cluster mithilfe von Kerberos. Prinzipiell können beider Projekte mit Kerberos abgesichert werden. Allerdings ist die Funktionalität bei Elasticsearch nur in einem kostenpflichtigen Zusatzpaket der Firma \textit{Elastic}\footnote{Siehe Link: \url{https://www.elastic.co/}. Letzter Stand: 9.9.2018.} enthalten.\\
-Zuletzt unterscheiden sich beide Projekte auch in der Art und Weise, wie die Daten verteilt indexiert werden können. Bei Elasticsearch gibt es eine Bibliothek, welche die bereits bekannten \textit{Apache Spark Resilient Distributed Datasets} (RDDs) direkt in Elasticsearch indexieren kann.\footnote{Siehe Link: \url{https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html}. Letzter Stand: 9.9.2018.} Diese Möglichkeit ist prinzipiell sehr gut, um extrahierte Daten direkt indexieren zu können.\\
+Elasticsearch horizontal skalierbar und kann auf einem Computer-Cluster installiert werden. Allerdings wird ein eigener Mechanismus zur Koordination des Verbunds genutzt und es existiert für die \textit{Hortonworks Data Platform} kein Installationspaket zur Nutzung von Elasticsearch im Hadoop-Umfeld. Dies bedeutet, dass Elasticsearch eigenständig im Computer-Cluster ausgerollt und überwacht werden muss.\\
+
+\noindent
+Ein weiterer Punkt ist die Absicherung der Cluster mithilfe von Kerberos. Prinzipiell können beide Projekte mit Kerberos abgesichert werden. Allerdings ist die Funktionalität bei Elasticsearch nur in einem kostenpflichtigen Zusatzpaket der Firma \textit{Elastic}\footnote{Siehe Link: \url{https://www.elastic.co/}. Letzter Stand: 9.9.2018.} enthalten.\\
+
+\noindent
+Zuletzt unterscheiden sich beide Projekte auch in der Art und Weise, wie die Daten verteilt indexiert werden können. Bei Elasticsearch gibt es eine Bibliothek, welche die bereits bekannten \textit{Apache Spark Resilient Distributed Datasets} (RDDs) direkt in Elasticsearch indexieren kann.\footnote{Siehe Link: \url{https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html}. Letzter Stand: 9.9.2018.} Diese Möglichkeit eignet sich sehr gut, um Daten indexieren zu können.\\
 Apache Solr hingegen bietet auch eine Möglichkeit mit Apache Spark Daten in die Solr-Cloud zu indexieren.\footnote{Siehe Link: \url{https://github.com/lucidworks/spark-solr}. Letzter Stand: 9.9.2018} Allerdings ist die Schnittstelle etwas umständlicher nutzbar, da keine RDDs sondern die bereits beschriebenen \textit{DateFrames} genutzt werden müssen.\\
-Viel interessanter ist jedoch das Open-Source Projekt \textit{Lily HBase Indexer}.\footnote{Siehe Link: \url{https://github.com/NGDATA/hbase-indexer}. Letzter Stand: 9.9.2018.} Damit können Daten direkt aus HBASE in den Solr-Cluster indexiert werden. 
-Im Rahmen der Thesis wird letztes Projekt genutzt, um die Metadaten aus HBASE in Solr zu indexieren. 
-
-
-
-
-Ein weitere Anwendungsfall ist die Indizierung von Texten und Wörtern, welche aus den einzelnen Dateien extrahiert wurden.\\
+%TODO Spark-Connector von Databricks?
 
 \noindent
-Der Grund für eine Indizierung dieser Inhalte ist eine schnellere Suche nach beliebigen Wörtern, als bei der reinen Suche in HBASE. Zur Indizierung existieren zwei bekannte Projekt. Diese sind einerseits \textit{Apache Solr} und andererseits \textit{Elasticsearch}. Bei bauen wiederum auf das \textit{Apache Lucene}-Projekt auf. Apache Solr ist ein Open-Source Projekt unter dem Dach der Apache Foundation. Wohingegen Elasticsearch auch als Open-Source Projekt entwickelt wird, jedoch primär von der kommerziellen Firma \textit{Elastic???} verwaltet wird. Diese bietet gerade Zusatzpakete und Support gegen Bezahlung an.
-Siehe auch \cite[S.7]{solr_search}
-\subsubsection{Apache Solr}
-Spark-Connector von Databracks vorhanden. Der Connector selbst bietet aber vorzugsweise lesenden Zugriff.
+Ein weiterer Vorteil von Apache Solr ist das sogenannte \textit{Solr Cell (Content Extraction Library)}, welche das bereits beschriebene Apache Tika nutzt, um Text aus PDF-Dokumenten, Word-Dokumenten oder Bildern zu extrahieren.\footnote{Siehe Link: \url{https://lucene.apache.org/solr/guide/7_4/uploading-data-with-solr-cell-using-apache-tika.html\#uploading-data-with-solr-cell-using-apache-tika}. Letzter Stand: 11.9.2018.} Diese Funktionalität könnte gegebenenfalls wiederverwendet werden, um beliebige Daten automatisch zu indexieren. Eine ähnliche Funktionalität bei Elasticsearch müsste selbst implementiert werden.\\
 
 \noindent
-Abbildung \ref{fig:hbase_solr_indexing} stellt die physikalische Aufteilung mit dem hbase-indexer projekt
-
+Eine interessante Möglichkeit Datein in Solr zu indexieren, bietet das Open-Source Projekt \textit{Lily HBase Indexer}.\footnote{Siehe Link: \url{https://github.com/NGDATA/hbase-indexer}. Letzter Stand: 9.9.2018.} Damit können Daten direkt aus HBASE in den Solr-Cluster indexiert werden. 
+Im Rahmen der Thesis wird letzteres Projekt genutzt, um die Metadaten aus HBASE in Solr zu indexieren. Abbildung \ref{fig:hbase_solr_indexing} stellt die physikalische Aufteilung mit dem Lily Hbase Indexer dar.\\
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{./resource/hbase_solr_indexierung.pdf}
@@ -159,47 +154,77 @@ Abbildung \ref{fig:hbase_solr_indexing} stellt die physikalische Aufteilung mit 
   \label{fig:hbase_solr_indexing}
 \end{figure}
 
-%TODO : Vergleich zu Elasticsearch!
-%Spark-Connector auf RDD-Basis vorhanden. Kerberos-Sicherung nur über X-Pack gegen Geld vorhanden. Rack-Awareness und Verteilung nicht klar. Elasticsearch baut eigene Infrastruktur auf. Nicht über Ambari steuerbar.
+\noindent
+Das Projekt selbst bietet mehrere Möglichkeiten, wie Daten indexiert werden können. Die hier genutzt Variante basiert auf einem sogenannten \textit{Side-Effect Processor}.\cite{hbase_sep} 
+Dieser Side-Effect Processor registriert sich bei HBASE als weiterer Knoten zur Datenreplikation. Aus Sicht von HBASE werden die Daten zu einem weiteren Knoten repliziert. Die Replikation läuft asynchron im Hintergrund und soll dadurch die Schreibgeschwindigkeit bei HBASE nicht beeinflussen. Jede neue Zeile und jede Datenmodifikation in HBASE wird automatisch repliziert und dadurch in Solr indexiert.
+Auch das Löschen von Zeilen wird entsprechend in Solr übernommen. Damit HBASE die Daten repliziert, müssen die Tabellen und deren Spaltenfamilien extra zur Replikation markiert werden. Unabhängig von dieser Replikation, werden die Daten immer auf mehreren Knoten repliziert, da HBASE die Informationen in Dateien auf dem HDFS ablegt. Und jede Datei im HDFS wird mindestens dreifach repliziert.\\
+
+\noindent
+Ein Nachteil an dieser Variante ist die Tatsache, dass keine Binärdaten mithilfe von \textit{Solr Cell} verteilt indexiert werden können. Hierzu müsste das \textit{Lily Hbase Indexer}-Projekt erweitert werden.\footnote{Darüber hinaus wird das Projekt derzeit nicht mehr gepflegt. Die letzte Änderung im Git-Repository erfolgte im Dezember 2018.}\\
+
+\noindent
+Ein weiteres Hindernis zeigt sich bei der Software-Installation. So kann zwar Apache Solr für das Computer-Cluster nachinstalliert werden. Allerdings wird dann Solr nur auf einem Knoten installiert. Und auch für den Lily Hbase Indexer wird eine eigene kleine Server-Komponente benötigt, welche eigentlich auf allen Knoten installiert sein müsste, damit die Daten nach dem Prinzip der Datenlokalität ordnungsgemäß indexiert werden können.\\
+Darüber hinaus wird der Lily Hbase Indexer nicht mehr gepflegt und einigen Tests war die Integration des Indexers nur mit HBASE in der Version 1.X.X möglich. Eine erfolgreiche Integration mit HBASE 2.X.X war nicht möglich.\\ 
+
+\noindent
+Letztlich ist es aber möglich alle Metadaten aus HBASE zu indexieren und über Solr suchbar zu machen. Allerdings werden die horizontale Skalierung von Solr im Hadoop-Umfeld und das Indexieren von Binärdaten mithilfe des Indexers noch nicht unterstützt.\\ 
+Somit wäre es sinnvoll eine grundlegende Lösung zu überlegen und diese neu zu implementieren, da die bestehenden Projekte nicht die gewünschte Funktionalität abdecken können. 
+
+
 
 \section{Praxisbeispiele und deren Optimierungen}
-Gerade bei der Verarbeitung großer Datenmengen und unter Berücksichtigung des Prinzips der Datenlokalität existieren einige Fallstricke und Hürden bei der Implementierung der Datenverarbeitung. Im Hadoop-Umfeld und bei der Entwicklung im Spark-Context geht es nicht nur um die Art und Weise, wie die Algorithmen auf die Daten angewendet werden, sondern in erster Linie auch immer darum \textbf{wo} die einzelnen Programmteile ausgeführt werden. 
-Der Entwickler sollte immer wissen, in welchem Verarbeitungskontext er sich befindet. Zu dieser Problematik werden in diesem Kapitel einige Beispiele herausgegriffen, welche während der Bearbeitung dieser Thesis aufgetreten sind.\\
+Bei der Verarbeitung großer Datenmengen sollte immer das Prinzip der Datenlokalität berücksichtigt werden. Darüber hinaus gibt es weitere Optimierungen, um die Datenmenge auf das nötige Minimum zu reduzieren und die verfügbaren Ressourcen optimal auszunutzen. Im Hadoop-Umfeld und bei der Entwicklung mit Apache Spark ist es besonders wichtig zu verstehen, auf welchen Knoten welche Teile des Programmcodes ausgeführt werden. Der Entwickler sollte immer wissen, in welchem Verarbeitungskontext er sich befindet. Zu dieser Problematik werden in diesem Kapitel einige Beispiele herausgegriffen, welche während der Bearbeitung dieser Thesis aufgetreten sind.\\
 
-\noindent
-\subsection*{Weniger ist mehr TODO}
-Ungenutzte Daten so früh wie möglich aus der Verarbeitung rausnehmen. Siehe
-Problematik beim HBASE-Spark Connector. Entweder ich mache einen Full-Table Scan und fodere
-alle Daten an, um sie später im Spark-Executor auszuführen, oder ich versuche schon beim Zugriff der Daten in den Region-Server mit ColumnFamilies und Filter-Operationen nur die Daten anzufordern, welche auch wirklich benötigt werden. 
-\subsection*{Caching - Performanz vs. Ressourcen TODO}
-Hashing-Problem. Ist es geschickter Daten zu Cachen anstatt sie zweifach anzufordern?
-Funktioniert Caching überhaupt mit nicht serializierbaren Daten?
-\subsection*{Faulheit ist der Schlüssel zum Erfolg TODO}
-Lazy-Loading und Ausführung bei RDDs
+\subsection*{Datenminimierung}
+Wie bereits beschrieben können die Metadaten aus HBASE mithilfe des \textit{HBASE-Spark Connectors} geladen werden. Hierbei können die einzelnen Zeilen mit allen Spalten geladen und in Spark verarbeitet werden. In Spark wiederum können diese \textit{RDDs} nach bestimmten Kriterien gefiltert werden. Beispielsweise werden bei der Berechnung von Hashsummen die Zeilen nach logischen Dateien gefiltert. Verzeichnisse oder symbolische Links werden verworfen. Zusätzlich wird für die Berechnung von Hashsummen auch nur der Dateiinhalt benötigt. Andere Metadaten sind überflüssig. Auch diese Werte können in den Spark RDDs einfach herausgefiltert werden. Allerdings befinden sich diese Daten zu dem Zeitpunkt schon in den einzelnen Spark Executoren. Viel effizienter ist es, diese Filterungen schon bei der Anfrage in der Datenbank durchzuführen. So bietet der \textit{HBASe-Spark Connector} die Möglichkeit diverse Filter auf Zeilen und Spalten anzuwenden, um bereits in den einzelnen RegionServer die benötigte Datenmenge auf das notwendige Minimum zu begrenzen. Diese Optimierung fällt bei kleinen Datenmengen in einer Testumgebung kaum ins Gewicht. Bei großen Datenmengen in einem produktiven Cluster, kann hier aber einiges an Ressourcenverbrauch und Zeit eingespart werden, wenn die Datenmenge schon direkt in HBASE gefiltert wird.\\
 
-\subsection*{Teile und Herrsche TODO}
-Balancing and Repartitionieren. Aufteilung der Last zu gleichen Teilen!
-Gerade beim Ausprobieren und Testen ist es einfach, die Resultate eines RDDs nach der Datenverarbeitung über eine Konsole auszugeben. Doch hierbei muss genau überlegt werden, wie diese Resultate ausgegeben werden (siehe Listing \ref{lst:spark_rdd_collect}). In der ersten Variante wird auf dem RDD die Methode collect() aufgerufen und die daraus erhaltene Liste von Objekten wird über ein Logger-Objekt in das Log-File dieser Ausführung geschrieben.\\
-Auf der ersten Blick ist aber nicht ersichtlich, was diese Methode wirklich bewirkt. Wie bereits in Kapitel \ref{sec:theory_spark} (TODO: check reference) beschrieben, wird bei der Ausführung einer Spark-Anwendung ein sogenannter Spark-Driver gestartet. Dieser wiederum fordert eine gewisse Anzahl von Exekutoren an, die die eigentlich Datenverarbeitung übernehmen (Master-Slave-Prinzip). Hierbei laufen die Executoren auf einzelnen Knoten innerhalb des Clusters. In dem Moment, in welchem die collect()-Methode auf einem RDD ausgeführt wird, werden die Daten des RDDs \textit{eingesammelt}. Dies bedeutet, dass die Daten des RDDs, welche vorher verteilt auf allen Executoren im Arbeitsspeicher geladen wurden, nun jetzt an den Spark-Driver geschickt werden. Dieser sammelt sozusagen die Ergebnisse der Executoren ein. Diese Mechanismus ist an sich nicht problematisch und funktioniert auch gerade beim Testen mit kleinen Datenmengen. Bei großen RDDs hingegen, werden auch wieder alle Daten an der Driver geschickt und in den meisten Fällen wird dies den begrenzten Arbeitsspeicher des Drivers überfordern. Die Applikation wird mit einer OutOfMemoryException??? beendet!.\\
+\subsection*{Lazy Loading}
+Ein weiterer Aspekt, um den Ressourcenverbrauch minimal zu halten, ist das sogenannte \textit{Lazy Loading}. Beim diesem Entwurfsmuster aus der Softwareentwicklung geht es darum, die Daten nur dann zu laden und zu verarbeiten, wenn sie auch wirklich benötigt werden. Apache Spark implementiert dieses Entwurfsmuster in den Spark RDDs.\cite{spark_rdd}\\
+Listing \ref{lst:spark_lazy_loading} zeigt ein Beispiel. Dabei werden die Methoden unterteilt in \textit{Transformationen}, wie beispielsweise \textit{map()} oder \textit{filter()} und \textit{Aktionen}, wie zum Beispiel \textit{first()} oder \textit{reduce()}. Alle Transformationen sind \textit{lazy}. Wenn nun eine Transformation auf einem RDD aufgerufen wird, so wird diese Methode noch nicht ausgeführt. Sie wird erst ausgeführt sobald auf dem RDD auch eine Aktion ausgeführt wird. Dies kann die Effizienz der Datenausführung steigern, da die Daten auch nur verarbeitet werden, wenn ein Ergebnis einer Aktion benötigt wird.
 
-\noindent
-Daher ist es sinnvoll auch schon beim Testen mit kleinen RDDs vorzugsweise die take()-Methode zu nutzen. Diese tut das gleiche wie, die collect()-Methode mit dem Zusatz, dass sie nur ein bestimmte Anzahl von Einträgen sammelt. Dadurch wird selbst bei größeren RDDs der Speicher nicht ausgehen. 
+\begin{lstlisting}[label={lst:spark_lazy_loading},caption= Lazy Loading bei Apache Spark ,captionpos=b,frame=single,style=customjava]
+JavaRDD<Data> data = getData();
+// Definiere Transformationen
+data.map(x -> convert(x))
+	.filter(Objects::nonNull)
+	.map(y -> convertToZ(y))
+	// Erst nachdem die "Aktion" first() aufgerufen wird,
+	// werden auch die Daten geladen und verarbeitet.
+	.first()
+\end{lstlisting}
 
+\subsection*{Zwischenergebnisse Speichern}
+Wie bereits erläutert unterscheidet Apache Spark bei den Methoden zwischen Transformationen und Aktionen, die auf ein RDD angewendet werden. Meistens werden ein oder mehrere Transformationen auf ein RDD angewendet und zum Schluss folgt eine Aktion, welche das Ergebnis der Datenverarbeitung zurückliefert. In vielen Fällen werden mehrere Ergebnisse berechnet, welche teilweise auf ähnlichen Transformationen aufbauen. Allerdings kann ein RDD, welches durch eine abschließende Aktion einmal ausgeführt wurde, nicht einfach wiederverwendet werden. Spark bietet aber die Möglichkeit Zwischenergebnisse einzelner RDDs explizit zwischenzuspeichern, um sie für die Berechnung anderer Ergebnisse wiederzuverwenden. Ein Beispiel wäre aus dem forensischen Umfeld ist die Berechnung von Hashsummen. Beispielsweise sollen die Hashsummen von allen Dateien berechnet werden und gespeichert werden. Zusätzlich sollen Duplikate (Dateien mit gleicher Hashsumme) ausgegeben werden. Das sind zwei unterschiedliche Ergebnismengen, wobei die Ermittlung der Duplikate auf der Berechnung der Hashsummen aufbaut. Prinzipiell müssten jetzt zwei unabhängige RDDs erstellt werden. Wobei beide im ersten Schritt die Hashsummen der Rohdaten berechnen. Diese Arbeit wird bei zwei unabhängigen RDDs im Computer-Cluster auch zweifach ausgeführt und benötigt auch doppelt so viele Ressourcen. Daher wäre es in diesem Beispiel sinnvoll, die Berechnung der Hashsummen zwischenzuspeichern und die Ermittlung von Dateiduplikaten darauf aufzubauen.\\
+Diese Zwischenspeicherung spart Ressourcen und erhöht die Performanz der Datenverarbeitung. Hierbei ist es bei Spark möglich, die Daten im Arbeitsspeicher zwischenzuspeichern oder falls der Speicher nicht ausreicht, auf einen persistenten Datenspeicher auszuweichen. Allerdings müssen die Daten serialisierbar sein. Dies ist nicht immer gegeben. Letztlich ist das Zwischenspeichern von Daten (Caching) in Spark eine wichtige Funktion, um die Effizienz der Datenverarbeitung zu erhöhen.\cite{spark_rdd}
 
-\begin{lstlisting}[label={lst:spark_rdd_collect},caption= Spark Java RDD collect()-Methode ,captionpos=b,frame=single,style=customjava]
+\subsection*{Verteilte Datenverarbeitung}
+%Balancing and Repartitionieren. Aufteilung der Last zu gleichen Teilen!
+Bei der lokalen Entwicklung von Spark-Anwendung ist es einfach, die Resultate eines RDDs über eine Konsole auszugeben. Dadurch kann schnell geprüft werden, ob die Ergebnisse aus fachlicher Sicht korrekt sind. Was hingegen auf kleinen lokalen Testknoten nicht geprüft werden kann, ist die korrekte Skalierung bei großen Datenmengen. Hierbei muss genau überlegt werden, wie die Ergebnisse ausgegeben werden sollen (siehe Listing \ref{lst:spark_rdd_collect}). 
+
+\begin{lstlisting}[label={lst:spark_rdd_collect},caption= Anzeige der Ergebnisse eines Spark RDDs ,captionpos=b,frame=single,style=customjava]
 
 HbaseReader hbr = new HbaseReader(jsc, hbaseConfigFile);
 JavaRDD<Metadata> forensicMetadata = hbr.getForensicMetadata();
 
-// use collect() method
+// collect()-Methode
 forensicMetadata.collect().stream()
 	.forEach(m -> LOGGER.info("Entry = .", m));
 
-// use take(int amount) method	
+// take(int amount)-Methode	
 forensicMetadata.take(10).stream()
 	.forEach(m -> LOGGER.info("Entry = .", m));	
 \end{lstlisting}
 
+\noindent
+In der ersten Variante wird auf dem RDD die Methode collect() aufgerufen und die daraus erhaltene Liste von Objekten wird über ein Logger-Objekt in das Log-File dieser Ausführung geschrieben.\\
+Auf der ersten Blick ist aber nicht ersichtlich, was diese Methode wirklich bewirkt. Wie bereits in Kapitel \ref{sec:theory_spark} beschrieben, wird bei der Ausführung einer Spark-Anwendung ein sogenannter Spark-Driver gestartet. Dieser wiederum fordert eine gewisse Anzahl von Exekutoren an, die die eigentlich Datenverarbeitung übernehmen (Master-Slave-Prinzip). Hierbei laufen die Executoren auf einzelnen Knoten innerhalb des Clusters. Ein Spark RDD wird bei der Verarbeitung auf eben diesen Executoren aufgeteilt. Doch je nachdem, welche \textit{Aktion} die Ergebnismenge des RDDs zurückliefert, wird das Ergebnis weiterhin verteilt gespeichert oder aber es wird an den Spark-Driver zurückgesendet. In dem Moment, in welchem beispielsweise die collect()-Methode auf einem RDD ausgeführt wird, werden die Daten des RDDs \textit{eingesammelt}. Dies bedeutet, dass die Daten des RDDs, welche vorher verteilt auf allen Executoren im Arbeitsspeicher geladen wurden, nun jetzt an den Spark-Driver geschickt werden. Diese Mechanismus ist an sich nicht problematisch und funktioniert auch gerade beim Testen mit kleinen Datenmengen. Bei großen RDDs hingegen, werden abermals alle Ergebnisse an den Driver geschickt. Da der Driver aber auch nur begrenzte Ressourcen zugeteilt bekommt, wird in den meisten Fällen der Arbeitsspeicher ausgehen und die Anwendung wird abgebrochen.\\
+
+\noindent
+Daher ist auch schon beim Testen mit kleinen RDDs sinnvoll, die Daten entweder verteilt zu auszugeben oder die Ergebnismenge, welche an Driver gesendet wird, zu begrenzen. Im zweiten Teil von Listing \ref{lst:spark_rdd_collect}  wird hierzu die take()-Methode verwendet. Diese tut das gleiche wie, die collect()-Methode mit dem Zusatz, dass sie nur ein bestimmte Anzahl von Einträgen einsammelt. Dadurch wird selbst bei größeren RDDs der Speicher nicht ausgehen.\\
+In der finalen Lösung hingegen sollten die Ergebnisse auch verteilt gespeichert werden.  So können mithilfe der Methode \textit{saveAsTextFile()} die Ergebnisse eines Spark RDDs in das HDFS gespeichert werden. Hierbei legt jeder Executor ein eigene Textdatei im HDFS an und speichert dort seinen Anteil der Ergebnismenge. Dadurch ist eine korrekte verteilte Datenverarbeitung auch bei großen Datenmengen ohne Flaschenhals möglich. 
+
+
 \section{Leistungsanalyse}
+\label{sec:performance_analysis}
 TODO: Geschwindigkeit und Ressourcenverbrauch analysieren. Hierzu gehört auch die Performanz beim Datenimport! Maximal 3 Seiten.
 
