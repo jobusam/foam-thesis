@@ -1,6 +1,8 @@
 \chapter{Zusammenfassung}
 \label{ch:zusammenfassung}
 \textbf{TODO: 2 Seiten Zusammenfassung}!\\
+%TODO Die Ergenbnisse kurz kritisch hinterfragen und Antworten ob die Plattform für forensische Analysen passen würde. Hier könnte gesagt werden, dass es zwar noch etliche Aspekte fehlen, aber es durchaus mit Hadoop möglich ist!!!
+
 Die Ergebnisse dieser Arbeit zeigen die Machbarkeit einer forensischen Auswertung von großen Datenmengen in einem Computer-Cluster auf Basis von Apache Hadoop. Um die Daten parallel zu verarbeiten, müssen diese in voneinander unabhängig verarbeitbaren Strukturen gespeichert werden. Hierzu bietet es sich an, die Daten als getrennte logische Dateien abzuspeichern, so wie sie aus logischer Sicht in den Datenträgerabbildern persistiert sind.\\
 Ein kritischer Aspekt ist die Speicherung beliebig kleiner und großer Dateien für eine optimale Verarbeitung. Als Lösung werden die Vorteile unterschiedlicher Datenhaltungen kombiniert. So werden beliebig große Dateien direkt im verteilten Dateisystem von Apache Hadoop gespeichert. Kleine Dateien, kleiner 10 Megabyte, werden hingegen in der verteilten spaltenorientierten Datenbank HBASE gespeichert. Dort können auch die Metadaten und Analyseergebnisse der Datenverarbeitung abgelegt werden.\\
 
