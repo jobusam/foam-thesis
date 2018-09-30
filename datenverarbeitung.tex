@@ -226,5 +226,39 @@ In der finalen Lösung hingegen sollten die Ergebnisse auch verteilt gespeichert
 
 \section{Leistungsanalyse}
 \label{sec:performance_analysis}
-TODO: Geschwindigkeit und Ressourcenverbrauch analysieren. Hierzu gehört auch die Performanz beim Datenimport! Maximal 3 Seiten.
+Die hier entwickelte forensische Analyseplattform soll den Forensiker dabei unterstützen, die Daten schnell verarbeiten und analysieren zu können. Hierbei spielt gerade die Zeitdauer zur Datenanalyse ein wichtige Rolle. In diesem Kapitel soll daher getestet werden, wie lange die Datenaufbereitung dauert. Einerseits soll ermittelt werden, wie lange es dauert bis ein großes Datenträgerabbild in die Analyseplattform importiert wurde und andererseits soll die Dauer der Datenverarbeitung getestet werden. Wobei die eigentliche Datenverarbeitung aus der Berechnung der Hashsummen und der Ermittlung der Medientypen besteht.\\
 
+\noindent
+Da im Hadoop-Cluster mehrere Knoten im Verbund arbeiten und unterschiedliche Technologien eingesetzt werden, ist es sehr schwer zuverlässige Testszenarien durchzuführen. Daher sollten die Ergebnisse dieser Testreihe vielmehr Anhaltspunkte liefern, in welchem groben Zeitraum wie viele Daten verarbeitet werden können.\\
+Das hier genutzt Testcluster besteht aus 3 Knoten und bildet daher das kleinste mögliche Hadoop-Cluster mit der standardmäßigen dreifachen Datenreplikation. Die drei Knoten sind identisch und enthalten jeweils eine Intel Core i5-6500 Quad-Core CPU ohne Hyperthreading, 32 GB Arbeitsspeicher, eine 512 GB SSD und eine 2 TB große Magnetfestplatte. Als Betriebssystem wird CentOS 7 (Version 7.5.1804) genutzt. Darauf wurde die Hortonworks Data Platform in der Version 2.6.5 installiert. Während das Betriebssystem jeweils auf der SSD installiert wurde, ist das Hadoop-Framework so konfiguriert, dass die Daten aus dem HDFS auf den langsameren und größeren Magnetfestplatten gespeichert werden. Dadurch hat das HDFS eine maximal Gesamtkapazität von knapp 6 TB. Die Knoten kommunizieren untereinander in einem getrennten Netzwerk über Gigabit-Ethernet.\\  
+
+\noindent
+Tabelle \ref{tab:performance_results} zeigt die Zeitdauer des Importvorgangs und der Datenverarbeitung. Das erste Datenträgerabbild ist knapp 10 GB groß und enthält eine Ubuntu Installation. Das zweite Datenträgerabbild ist ungefähr 155 GB groß und enthält eine Windows 10 Installation. Beide Datenträger wurden im Rahmen dieser Thesis erstellt und werden jeweils vier Mal in das Analysesystem importiert und verarbeitet.\footnote{Siehe Kapitel \ref{testdatacreation}.} \\
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l||ll}
+Datenträgerabbild & Dauer des Datenimports & Dauer der Datenverarbeitung	\\ \hline
+Ubuntu Image \#1 		& 9 min 45 sec	& 		\\
+Ubuntu Image \#2 		& 7 min 38 sec	&  			\\
+Ubuntu Image \#3 		& 7 min 55 sec	&		\\
+Ubuntu Image \#4 		& 9 min 30 sec	&	\\ \hline
+Windows Image \#1 		&  				&		\\
+Windows Image \#2 		&  				&	\\
+Windows Image \#3 		&  				&	\\
+Windows Image \#4 		&  				&		\\
+\end{tabular}
+\caption{Zeitdauer der Datenverarbeitung}
+\label{tab:performance_results}
+\end{table}
+
+\noindent
+Aus den Ergebnissen ist ersichtlich, dass gerade der Datenimport sehr viel Zeit benötigt. Dies verwundert nicht, da beim Importvorgang alle Dateien aus den Datenträgerabbilder vollständig in das Hadoop-Cluster importiert und gespeichert werden müssen. Interessanterweise ist das Hadoop-Cluster selbst nicht einmal annähernd voll ausgelastet. Vielmehr ist die Geschwindigkeit beim Datenimport stark abhängig von den genutzten Festplatten. Das HDFS im Testcluster ist so konfiguriert, dass die Daten auf die langsameren magnetischen Festplatten mit 7200 Umdrehungen pro Minute geschrieben werden. Hier könnte die Geschwindigkeit erhöht werden, wenn SSDs die Daten im HDFS speichern würden. Allerdings sind SDDs im Verhältnis zur Speichergröße aktuell noch deutlich teurer. Somit wäre dies eine Abwägungssache, ob bei gleichem verfügbaren Budget die Geschwindigkeit oder die Gesamtgröße des Datenspeichers erhöht werden soll.\\
+Ein weiterer Punkt ist aber auch der Datenträger, von welchem die Daten beim Import gelesen werden. Das hier verwendete Windows Datenträgerabbild wird auch auf einer magnetischen Festplatte gespeichert und ist über einen USB 3.0 Controller an einen Knoten der Analyseplattform angebunden. Ein anderes Szenario wäre der Datenimport von einem entfernten Netzwerknoten. Hier hängt die Geschwindigkeit des Importvorgangs zudem noch von der maximalen Bandbreite der dazwischenliegenden Netzwerke ab.\\
+
+\noindent
+Die gesamte Verarbeitungsgeschwindigkeit könnte erhöht werden, wenn mehrere Datenträger parallel in das Analysesystem importiert werden. Somit könnte eine optimale Auslastung der Hadoop-Komponenten erreicht werden. Zumal bei forensischen Analysen oftmals mehrere Asservate sichergestellt werden und diese dann auch parallel verarbeitet werden sollen.\\
+
+\noindent
+Andererseits macht es aus Anwendersicht keinen Sinn, zuerst das Asservat vollständig zu importieren und erst danach mit der Aufbereitung und Analyse zu beginnen. Letztlich könnten die Daten mit Spark auch schon verarbeitet werden, sobald die ersten Dateien im HDFS oder in HBASE gespeichert wurden. Durch diesen \textit{Streaming-Modus} hätte der Nutzer schon während dem Import die Möglichkeit, die ersten eingehenden Daten zu analysieren und müsste nicht warten, bis der Import vollständig beendet wurde. Auch die Datenindexierung könnte schon während dem Importvorgang durchgeführt werden. Dieser Ansatz wäre sinnvoll, um die Verarbeitungszeit nochmals deutlich zu senken und die Verarbeitungsschritte besser parallelisieren zu können. Daher sollte diese Art der Datenverarbeitung in einer zukünftigen Weiterentwicklung implementiert werden.
