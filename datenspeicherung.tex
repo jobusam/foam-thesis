@@ -52,10 +52,12 @@ Ein primärer Aspekt bei dem allgemeinen forensischen Analyseprozess aus Abbildu
 \end{itemize}
 
 \noindent
-Ein sehr wichtiger Punkt bei der Dokumentation der Beweismittelkette ist die Verifikation der Datenintegrität der Asservate während des gesamten Analyseprozesses. Dies wird primär durch die Prüfung mittels kryptografischer Hashes erreicht. Letztlich dienen diese zum Schutz vor einer unbeabsichtigten oder beabsichtigten Modifikation des Beweismittels. Das Ändern von Asservaten oder deren Kopien sollte eigentlich immer vermieden werden. In vielen Fällen ist dies jedoch notwendig, um beispielsweise defekte Datenstrukturen wiederherstellen zu können. Bei solchen bewussten Datenänderungen ist eine entsprechende Dokumentation notwendig.\\ 
+Ein sehr wichtiger Punkt bei der Dokumentation der Beweismittelkette ist die Verifikation der Datenintegrität der Asservate während des gesamten Analyseprozesses. Dies wird primär durch die Prüfung mittels kryptografischer Hashes erreicht. Letztlich dienen diese zum Schutz vor einer Modifikation des Beweismittels. Das Ändern von Asservaten oder deren Kopien sollte eigentlich immer vermieden werden. In vielen Fällen ist dies jedoch notwendig, um beispielsweise defekte Datenstrukturen wiederherstellen zu können. Bei solchen bewussten Datenänderungen ist eine entsprechende Dokumentation erforderlich.\\ 
+
+\noindent
 Bei der Analyse mit der hier entwickelten Analyseplattform muss auch die Beweismittelkette entsprechend dokumentiert werden. Die derzeitige Implementierung der forensischen Analyseplattform behandelt diesen Aspekt noch nicht. Aber auch hier könnte in einer Weiterentwicklung eine Beweismittelkette erstellt werden, welche die einzelnen Verarbeitungsprozesse, Zeitpunkte und Nutzerzugriffe dokumentiert. Da das System gegen unbefugten Zugriff gesichert werden muss, könnten in einer zukünftigen Weiterentwicklung Maßnahmen zur Nutzeridentifikation und Authentifizierung implementiert werden (siehe Kapitel \ref{sec:secure_platform}). Diese Mechanismen protokollierten einzelne Nutzeranmeldungen und Datenzugriffe, welche dann wiederum als Grundlage zur automatischen Erstellung eines Protokolls zur Beweismittelkette dienen könnten.\\
 
-\section{Herkömmliches Analysevorgehen}
+\section{Klassisches Analysevorgehen}
 \label{sec:common_analysis_approach_part1}
 Um die fachlichen Anforderungen an das Analyse-System herauszuarbeiten, soll das herkömmliche Analysevorgehen mit einem vergleichbaren Open-Source Analysewerkzeug betrachtet werden.\\
 Die Ausgangslage liefern einige Datenträgerabbilder aus diversen Testszenarien. Diese Datenträgerabbilder sind bezogen auf den forensischen Analyseprozess aus Abbildung \ref{fig:digital_forensics_process} die Grundlage für dir dritte Phase - dem Sichten und Aufbereiten der Daten.
@@ -256,9 +258,10 @@ Auch die Speicherung von kleinen Dateien könnte von HBASE übernommen werden. G
 Diese Problematik von kleinen und großen Dateien wurde bereits in den vorherigen Varianten angesprochen. An dieser Stelle soll diese Thematik nochmals näher betrachtet werden. Nicht zuletzt soll anhand einiger Datenträgeranalysen ein Grenzwert ermittelt werden, nach welchem die Analyseplattform die Dateien entweder in HBASE oder im HDFS ablegt.\\
 
 \noindent
-Wie bereits beschrieben, kann das HDFS mit großen und kleinen Dateien umgehen. Letztlich ist die Speicherung in große Dateien der primäre Anwendungsfall. Im Gegensatz dazu können viele kleine Dateien nicht effizient gespeichert werden. Es geht aber nicht darum, dass eine einzelne kleine Datei weniger effizient abgespeichert werden kann als eine große Datei. Vielmehr kann der Informationsgehalt einer einzeln großen Datei (beispielsweise als Sequence File) effizienter gespeichert werden, als der gleiche Informationsgehalt aufgeteilt in dutzende kleine Dateien. \\
+Das HDFS kann mit großen und kleinen Dateien umgehen. Die Speicherung großer Dateien ist jedoch der primäre Anwendungsfall. Im Gegensatz dazu können viele kleine Dateien nicht effizient gespeichert werden. 
+Es geht aber nicht darum, dass eine einzelne kleine Datei weniger effizient abgespeichert werden kann als eine große Datei. Vielmehr kann der Informationsgehalt einer einzeln großen Datei (beispielsweise als Sequence File) effizienter gespeichert werden, als der gleiche Informationsgehalt aufgeteilt in dutzende kleine Dateien.
 Dies liegt daran, dass für jede Datei Metadaten gespeichert werden. Und diese Metadaten werden auf dem Name Node gespeichert und auch im Arbeitsspeicher vorgehalten.\cite{hdfs_architecture} Ein Eintrag ist beispielsweise ungefähr 150 bis 200 Bytes groß. Für eine Datei wird ein Metadateneintrag und ein Blockeintrag im Name Node angelegt (insgesamt 300-400 Byte). Wenn nun ein Million kleine Dateien abgespeichert werden, dann werden 300-400 MB an Arbeitsspeicher benötigt. 
-Dies klingt eigentlich nach einem vertretbaren Ressourcenverbrauch.\\
+Dies klingt nach einem vertretbarer Ressourcenverbrauch.\\
 
 \noindent
 Letztlich geht es aber auch um die Netzwerklast. Denn bei der Verarbeitung der Daten werden auch eine Million Aufrufe an den Name Node gesendet, da nur er weiß, wo der Dateiinhalt liegt. Wenn nun diese eine Million Dateien in ein einzelnes Sequence File gepackt werden, dann benötigt der Name Node nur 300-400 Byte Arbeitsspeicher und zur Datenverarbeitung werden weniger Netzwerkressourcen benötigt.\\
