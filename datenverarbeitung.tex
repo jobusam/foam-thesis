@@ -30,7 +30,7 @@ Nachfolgend werden die Module von Autopsy aufgelistet, welche noch nicht in der 
 \item Das \textit{Hash Lookup Modul} ermöglicht es die Datei-Hashsummen mit bereits bekannten Hashsummen zu vergleichen. Damit können bekannte Betriebssystemdateien schnell gefiltert werden. Analog zu einem Virenscanner kann dadurch auch bekannte bösartige Malware gefunden werden.
 \item Das \textit{Embedded File Extractor Modul} ermöglicht das Entpacken von Archivdateien, wie beispielsweise \textit{ZIP}-Dateien.
 \item Das \textit{Exif Parser Modul} ermöglicht die Anzeige der sogenannten \textit{EXIF}-Metadaten aus \textit{JPEG}-Bilddateien. In der forensischen Analyseplattform könnte diese Funktionalität auch mit Apache Tika implementiert werden.
-\item Das \textit{Email Parser Modul} extrahiert E-Mails aus diversen E-Mail Archiven, wie beispielsweise dem \textit{PST}-Dateiformat, welches von Microsoft Outlook genutzt wird.
+\item Das \textit{Email Parser Modul} extrahiert E-Mails aus diversen E-Mail Archiven, wie beispielsweise dem \textit{\acrshort{pst}}-Dateiformat, welches von Microsoft Outlook genutzt wird.
 \item Das \textit{Extension Mismatch Detector Modul} ermittelt Dateien, deren Dateiendung nicht zum analysierten Medientyp des Dateiinhalts passen. Dies könnte auf versteckte Dateien hinweisen. Ein ähnliche Funktion könnte in der forensischen Analyseplattform über die Volltextsuche implementiert werden, da die Dateiendung und der Medientyp bekannt sind.
 \item Das \textit{E01 Verifier Modul} verifiziert speziell für das forensische Analyseformat \textit{E01} die Dateiprüfsummen mit den gespeicherten Prüfsummen. Damit können Änderungen an einem sichergestellten Asservat identifiziert werden.
 \item Das \textit{Interesting Files Identifier Modul} identifiziert interessante Dateien, welche vorher durch bestimmten Suchkriterien, wie beispielsweise Dateinamen und Datentypen, definiert wurden.
@@ -50,7 +50,7 @@ Nachdem die benötigten Module in Autopsy aktiviert und nach fallspezifischen Ei
 Zur Datenverarbeitung in der forensischen Analyseplattform wird Apache Spark\texttrademark\thinspace genutzt. Der physikalische Aufbau wird im Grundlagenkapitel \ref{sec:theory_spark} behandelt. In diesem Kapitel sollen primär die Algorithmen und die Verarbeitung der Daten aus logischer Sicht betrachtet.\\ 
 
 \noindent
-Bei Apache Spark (Version 2.3.0) gibt es diverse Programmierschnittstellen (APIs), wie Daten geladen werden können. Es besteht die Möglichkeit Daten mithilfe von \textit{Resilient Distributed Datasets} (RDDs) zu laden und zu verarbeiten. Aufbauend auf diesen RDDs können die Daten konvertiert, gefiltert oder aggregiert werden.
+Bei Apache Spark (Version 2.3.0) gibt es diverse Programmierschnittstellen (\acrshort{api}s), wie Daten geladen werden können. Es besteht die Möglichkeit Daten mithilfe von \textit{\glspl{rdd}} zu laden und zu verarbeiten. Aufbauend auf diesen RDDs können die Daten konvertiert, gefiltert oder aggregiert werden.
 Listing \ref{lst:spark_rdd_word_count} zeigt ein simples Beispiel zur Nutzung dieser RDDs, um alle Wörter aus einer Beispieldatei \path{history.txt} und deren Vorkommen aufzulisten. Die Implementierung kann abhängig von der Dateigröße und der Konfiguration von Spark verteilt auf mehreren Knoten ausgeführt werden, um die Datenverarbeitung zu beschleunigen. Die Daten werden aus dem HDFS gelesen und dort gespeichert.
 
 \begin{lstlisting}[label={lst:spark_rdd_word_count},caption= Beispielimplementierung eines Spark RDDs ,captionpos=b,frame=single,style=customjava]
@@ -82,7 +82,7 @@ Daher wird die Datenverarbeitung mithilfe von Spark RDDs implementiert. Auch bei
 \section{Anwendungsfälle der Datenverarbeitung}
 \subsection{Hashsummen ermitteln}
 Eine grundlegende Funktionalität einer forensischen Analysesoftware ist die Berechnung von Hashsummen, um die Integrität fallrelevanter Dateien für zukünftige Analysen prüfen zu können. Darüber hinaus können auf Basis der Hashsummen sehr einfach Duplikate erkannt werden (siehe Kapitel \ref{subsec:duplicate_files}).\\
-In der derzeitigen Implementierung wird der der \textit{SHA-512} Algorithmus genutzt, um eindeutige kryptografisch sichere Hashsummen zu berechnen. Bei Autopsy hingegen werden \textit{MD5}-Hashsummen berechnet. Der MD5-Algorithmus gilt mittlerweile jedoch als kryptografisch unsicher, da Hash-Kollisionen in wenigen Stunden berechnet werden können.\cite[S. 240-243]{hacking_and_security}\\
+In der derzeitigen Implementierung wird der der \textit{\acrshort{sha}-512} Algorithmus genutzt, um eindeutige kryptografisch sichere Hashsummen zu berechnen. Bei Autopsy hingegen werden \textit{\acrshort{md5}}-Hashsummen berechnet. Der MD5-Algorithmus gilt mittlerweile jedoch als kryptografisch unsicher, da Hash-Kollisionen in wenigen Stunden berechnet werden können.\cite[S. 240-243]{hacking_and_security}\\
 
 \noindent
 Abbildung \ref{fig:data_processing_hashes} verdeutlicht den Datenfluss bei der Ermittlung von Hashsummen.
@@ -120,7 +120,7 @@ Abbildung \ref{fig:data_processing_media_types} zeigt den Datenfluss bei der Erm
 \end{figure}
 
 \noindent
-Prinzipiell kann Apache Tika den Medientyp auch nur anhand der Dateiendung oder anhand des Dateiinhalts erkennen. Wird allerdings nur die Dateiendung angegeben, so könnten beispielsweise Bilddateien mit gefälschter Dateiendung nicht korrekt erkannt werden. Wird hingegen nur der Dateiinhalt angegeben, so prüft Tika formatspezifische Bytesequenzen, welche oftmals am Dateianfang stehen. Bei Textdateien hingegen kann es nur identifizieren, dass es sich um eine Textdatei handeln könnte. Gerade bei Textdateien ist es sinnvoll, die Dateiendung in die Analyse mit aufzunehmen, um ein genaueres Ergebnis zu erhalten. Dadurch kann Tika beispielsweise ermitteln, ob es sich um eine CSV-Datei oder eine HTML-Datei handelt. Allerdings sollten diese Ergebnisse kritisch hinterfragt werden. Wie bereits erwähnt, könnte eine gefälschte Dateiendung bei Textdateien zu einem falschen Ergebnis führen.\\
+Prinzipiell kann Apache Tika den Medientyp auch nur anhand der Dateiendung oder anhand des Dateiinhalts erkennen. Wird allerdings nur die Dateiendung angegeben, so könnten beispielsweise Bilddateien mit gefälschter Dateiendung nicht korrekt erkannt werden. Wird hingegen nur der Dateiinhalt angegeben, so prüft Tika formatspezifische Bytesequenzen, welche oftmals am Dateianfang stehen. Bei Textdateien hingegen kann es nur identifizieren, dass es sich um eine Textdatei handeln könnte. Gerade bei Textdateien ist es sinnvoll, die Dateiendung in die Analyse mit aufzunehmen, um ein genaueres Ergebnis zu erhalten. Dadurch kann Tika beispielsweise ermitteln, ob es sich um eine \acrshort{csv}-Datei oder eine \acrshort{html}-Datei handelt. Allerdings sollten diese Ergebnisse kritisch hinterfragt werden. Wie bereits erwähnt, könnte eine gefälschte Dateiendung bei Textdateien zu einem falschen Ergebnis führen.\\
 Das Ermitteln der Medientypen ist gerade bei der Datenvisualisierung sinnvoll, da damit nach allen vorhandenen Bildern oder Videos gesucht werden kann.\footnote{Siehe auch Kapitel \ref{ch:data_visualization}.}
 
 \subsection{Volltextsuche und Datenindexierung}
@@ -141,7 +141,7 @@ Apache Solr hingegen bietet auch eine Möglichkeit mit Apache Spark Daten in die
 %TODO Spark-Connector von Databricks?
 
 \noindent
-Ein weiterer Vorteil von Apache Solr ist die sogenannte \textit{Solr Cell (Content Extraction Library)}, welche unter anderem auch Apache Tika nutzt, um Text aus PDF-Dokumenten, Word-Dokumenten oder Bildern zu extrahieren.\footnote{Siehe Link: \url{https://lucene.apache.org/solr/guide/7_4/uploading-data-with-solr-cell-using-apache-tika.html\#uploading-data-with-solr-cell-using-apache-tika}. Letzter Stand: 11.9.2018.} Diese Funktionalität könnte gegebenenfalls wiederverwendet werden, um beliebige Dateiinhalte automatisch zu indexieren. Eine ähnliche Funktionalität bei Elasticsearch müsste selbst implementiert werden.\\
+Ein weiterer Vorteil von Apache Solr ist die sogenannte \textit{\gls{solrcell}}, welche unter anderem auch Apache Tika nutzt, um Text aus PDF-Dokumenten, Word-Dokumenten oder Bildern zu extrahieren.\footnote{Siehe Link: \url{https://lucene.apache.org/solr/guide/7_4/uploading-data-with-solr-cell-using-apache-tika.html\#uploading-data-with-solr-cell-using-apache-tika}. Letzter Stand: 11.9.2018.} Diese Funktionalität könnte gegebenenfalls wiederverwendet werden, um beliebige Dateiinhalte automatisch zu indexieren. Eine ähnliche Funktionalität bei Elasticsearch müsste selbst implementiert werden.\\
 
 \noindent
 Eine interessante Möglichkeit Dateien in Solr zu indexieren, bietet das Open-Source Projekt \textit{Lily HBase Indexer}.\footnote{Siehe Link: \url{https://github.com/NGDATA/hbase-indexer}. Letzter Stand: 9.9.2018.} Damit können Daten direkt aus HBASE in den Solr-Cluster indexiert werden. 
