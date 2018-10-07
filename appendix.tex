@@ -16,7 +16,7 @@ Es gibt auch die Möglichkeit das Programm kollaborativ zu verwenden. Dabei gibt
 Allerdings geht es bei diesem kollaborativen Ansatz vielmehr darum, an einem großen Fall mit mehreren Nutzern zu arbeiten und Ergebnisse einfacher zusammenzutragen. Einzelne Analysen finden aber immer nur auf einem konkreten Analyserechner statt. Ein parallele Verarbeitung durch eine horizontale Skalierung wird durch die Anzahl parallel arbeitender Nutzer geschaffen. Jedoch kann das System nicht automatisiert einzelne Analysen auf allen verfügbaren Knoten verarbeiten, wie es in dieser Thesis geplant ist.\\
 
 \noindent
-Autopsy selbst bietet keine Möglichkeiten forensische Analysen im Cluster durchzuführen. Allerdings gibt es eine Variante des \textit{The Sleuth Kit}s, welche das gleiche Ziel verfolgt, wie in dieser Thesis. Hierbei wird die Funktionalität des \textit{The Sleuth Kit}s in einen Apache Hadoop Cluster übertragen (siehe \url{https://www.sleuthkit.org/tsk_hadoop/index.php}). Das Projekt selbst nutzt eben Apache Hadoop und auch Apache HBASE zur Speicherung von Datenträgern im Cluster. Zur Prozessierung der Daten wird allerdings nicht Apache Spark genutzt, sondern das Hadoop interne Map-Reduce Verfahren. Darüber hinaus wurden seit 2012 keine Änderungen an dem Open-Source Projekt gemacht (siehe Source-Code Repository auf GitHub unter \url{https://github.com/sleuthkit/hadoop_framework}). Es ist nicht bekannt aus welchen Gründen die Datenverarbeitung im Cluster eingestellt wurde.
+Autopsy selbst bietet keine Möglichkeiten forensische Analysen im Cluster durchzuführen. Allerdings gibt es eine Variante des \textit{The Sleuth Kit}s, welche das gleiche Ziel verfolgt, wie in dieser Thesis. Hierbei wird die Funktionalität des \textit{The Sleuth Kit}s in einen Apache Hadoop Cluster übertragen (siehe \url{https://www.sleuthkit.org/tsk_hadoop/index.php}). Das Projekt selbst nutzt eben Apache Hadoop und auch Apache HBase zur Speicherung von Datenträgern im Cluster. Zur Prozessierung der Daten wird allerdings nicht Apache Spark genutzt, sondern das Hadoop interne Map-Reduce Verfahren. Darüber hinaus wurden seit 2012 keine Änderungen an dem Open-Source Projekt gemacht (siehe Source-Code Repository auf GitHub unter \url{https://github.com/sleuthkit/hadoop_framework}). Es ist nicht bekannt aus welchen Gründen die Datenverarbeitung im Cluster eingestellt wurde.
 
 \section{Lizenzierungen in dieser Arbeit}
 \label{sec:licencing_issues}
@@ -31,16 +31,16 @@ Nachfolgend werden die Logos aufgelistet, welche in Abbildung \ref{fig:hadoop_fr
 \item Apache Ambari\texttrademark\thinspace Logo von \url{https://ambari.apache.org/}, Stand 21.3.2018. 
 \item Apache Hadoop\textsuperscript{\textregistered} Logo von \url{https://hadoop.apache.org/}, Stand 21.3.2018.
 \item Apache Spark\texttrademark\thinspace Logo von \url{https://spark.apache.org/}, Stand 21.3.2018.
-\item Apache HBASE\textsuperscript{\textregistered} Logo von \url{https://hbase.apache.org/}, Stand 21.3.2018.
+\item Apache HBase\textsuperscript{\textregistered} Logo von \url{https://hbase.apache.org/}, Stand 21.3.2018.
 \item Apache Hive\texttrademark\thinspace Logo von \url{https://hive.apache.org/}, Stand 21.3.2018.
-\item Apache Zookeeper\texttrademark\thinspace Logo von \url{https://zookeeper.apache.org/}, Stand 21.3.2018.
+\item Apache ZooKeeper\texttrademark\thinspace Logo von \url{https://zookeeper.apache.org/}, Stand 21.3.2018.
 \end{itemize}
 
 
 \chapter{Datenimport}
 \section{Konfigurationsdateien}
 \label{sec:appendix_data_import_config_management}
-Nachfolgend werden die minimalen Konfigurationsdateien dargestellt, welche beim Datenimport angegeben werden müssen. Diese werden genutzt um die Verbindung zum HDFS-Dateisystem und zur HBASE-Datenbank zu definieren. Letztlich muss in beiden Konfigurationen eigentlich nur der Service-Endpoint konfiguriert werden.
+Nachfolgend werden die minimalen Konfigurationsdateien dargestellt, welche beim Datenimport angegeben werden müssen. Diese werden genutzt um die Verbindung zum HDFS-Dateisystem und zur HBase-Datenbank zu definieren. Letztlich muss in beiden Konfigurationen eigentlich nur der Service-Endpoint konfiguriert werden.
 \lstinputlisting[label={lst:hdfs_core_xml},caption= Minimale Konfiguration der Datei \textit{hdfs-core.xml},captionpos=b,style=customshell]{resource/appendix/hdfs-core.xml}
 
 \lstinputlisting[label={lst:hbase_site_xml},caption= Minimale Konfiguration der Datei \textit{hbase-site.xml},captionpos=b,style=customshell]{resource/appendix/hbase-site.xml}
