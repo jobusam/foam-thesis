@@ -31,7 +31,7 @@ Apache Hadoop ist ein etabliertes Open-Source Framework zur verteilten Speicheru
 Ein wichtiger Aspekt der Masterthesis ist die Aufbereitung der Daten für die Analyse im Hadoop-Cluster. Hierbei sollen mehrere Möglichkeiten analysiert werden, wie diese Aufbereitung und Speicherung der Daten im Hadoop-Cluster gelingen kann. Dabei muss auch auf die Unversehrtheit der Dateiinhalte und Metadaten bei der Aufbereitung geachtet werden. Darauf aufbauend soll eine fachliche Verwaltungsstruktur entwickelt werden, die es auch erlaubt mehrere Asservate von beliebigen Ermittlungen parallel zu verarbeiten. Dadurch können auch Zusammenhänge zwischen unterschiedlichen Asservaten identifiziert werden.\\
 
 \noindent
-Im Rahmen der Thesis soll die Datenanalyse vorerst grundlegende Funktionen unterstützten.
+Im Rahmen der Thesis soll die Datenanalyse vorerst grundlegende Funktionen unterstützen.
 So sollen die Metadaten, wie beispielsweise Name, Dateipfad, Hashsumme, Dateityp, Größe und Zeitstempel ermittelt werden und zu weiteren Analysen zur Verfügung stehen.
 Es soll auch eine Volltextsuche auf den Daten möglich sein. Darauf aufbauend soll der Nutzer beispielsweise gleiche Dateien und Verbindungen zwischen den einzelnen Beweismitteln erkennen können.
 Optional könnte die Analyseplattform gezielt nach IP-Adressen, Web-Adressen, E-Mail-Adressen oder Positionsdaten\footnote{Beispielsweise könnten Geopositionen oder Ortsnamen aus Dateien extrahiert werden. Diese Daten könnten dann mit ihrem geografischen Bezug auf einer Karte dargestellt werden.} suchen.\\
@@ -57,7 +57,7 @@ Das Ziel dieser Masterthesis ist es, dem forensischen Ermittler schnellstmöglic
 Bei einer realen forensischen Analyse gibt es weitere Anforderungen, die das Analysesystem erfüllen sollte. Da in vielen Fällen hochsensible personenbezogene Daten und Geschäftsgeheimnisse verarbeitet werden, müssen auch entsprechende Regelungen getroffen werden, wie nach der Analyse alle Daten restlos aus dem System gelöscht werden können.\\
 Das System muss gegen fremden Zugriff gesichert sein. Es muss zu jeder Zeit ersichtlich sein, welche Personen zu welchem Zweck auf das System zugreifen.\\
 Ein weiterer Aspekt in der Analyse ist die lückenlose Erstellung einer Beweismittelkette (Chain of Custody). Für jedes forensische Analyseergebnis müssen die Herkunft und die Verarbeitungsschritte transparent nachvollziehbar sein.\\
-Im Rahmen der Masterthesis soll diese Aspekte zumindest theoretisch und wenn möglich auch praktisch analysiert werden.\\
+Im Rahmen der Masterthesis sollen diese Aspekte zumindest theoretisch und wenn möglich, auch praktisch analysiert werden.\\
 
 \noindent
 Aus organisatorischer Sicht soll die Analyseplattform als Open Source Projekt bereitgestellt werden. Hierzu soll der Source-Code, die Konfiguration des Systems und die Dokumentation in einer öffentlich zugänglichen Versionsverwaltung verfügbar sein.\\
@@ -66,6 +66,8 @@ Aus organisatorischer Sicht soll die Analyseplattform als Open Source Projekt be
 \clearpage
 \section{Aufbau}
 In Kapitel \ref{ch:einleitung} wird das Eingangsproblem und die Ziele dieser Masterthesis beschrieben.\\ 
+
+\noindent
 In Kapitel \ref{ch:development_approach} folgt das allgemeine Entwicklungsvorgehen. Darin ist der aktuelle Projektplan enthalten, welcher die Arbeitspakete definiert.
 Zusätzlich wird die genutzte Entwicklungsumgebung skizziert.\\
 
@@ -76,7 +78,7 @@ In Kapitel \ref{ch:theory_hadoop} erfolgt eine Darstellung der Apache Hadoop Pla
 In Kapitel \ref{ch:data_persistence} werden unterschiedliche Varianten zur Datenspeicherung und Aufbereitung analysiert. Innerhalb dieses Kapitels wird eine Möglichkeit entwickelt, wie die Daten eines Asservats im Hadoop-Cluster gespeichert werden können, um sie später parallelisiert verarbeiten zu können. Zu Beginn wird das herkömmliche Analysevorgehen in Verbindung mit der Analyseanwendung \textit{Autopsy} beschrieben, um fachlich relevante Aspekte bei der Analyse herauszuarbeiten.\\
 
 \noindent
-Die eigentliche Datenverarbeitung wird Kapitel \ref{ch:data_processing} beschrieben. Hier wird ein Ansatz vorgestellt, wie die Daten parallel verarbeitetet werden können. Anhand dieses Ansatzes werden Hashsummen der Daten berechnet und die Medientypen der Dateien ermittelt. Zum Schluss wird eine Möglichkeit vorgestellt, wie die Informationen für eine Volltextsuche aufbereitet werden können.\\
+Die eigentliche Datenverarbeitung wird in Kapitel \ref{ch:data_processing} beschrieben. Hier wird ein Ansatz vorgestellt, wie die Daten parallel verarbeitetet werden können. Anhand dieses Ansatzes werden Hashsummen der Daten berechnet und die Medientypen der Dateien ermittelt. Zum Schluss wird eine Möglichkeit vorgestellt, wie die Informationen für eine Volltextsuche aufbereitet werden können.\\
 
 
 
@@ -87,4 +89,7 @@ Die Visualisierung der Informationen ist ein interessanter Aspekt der forensisch
 In Kapitel \ref{ch:additional_aspects} werden querschnittliche Aspekte zur Datensicherheit von forensischen Analysen und zum Löschen von Daten dargestellt.\\
 
 \noindent
-Zuletzt erfolgt in Kapitel \ref{ch:zusammenfassung} eine Zusammenfassung der erarbeiteten Ergebnisse. Es wird auch aufgezeigt, ob das Apache Hadoop Framework überhaupt die Anforderungen einer forensischen Analyseplattform erfüllen kann. Offene Punkte und Verbesserungen des Systems werden in Kapitel \ref{ch:ausblick} diskutiert. 
+Zuletzt erfolgt in Kapitel \ref{ch:zusammenfassung} eine Zusammenfassung der erarbeiteten Ergebnisse. Es wird auch aufgezeigt, ob das Apache Hadoop Framework überhaupt die Anforderungen einer forensischen Analyseplattform erfüllen kann.\\
+
+\noindent
+Offene Punkte und Verbesserungen werden in Kapitel \ref{ch:ausblick} beschrieben. 
