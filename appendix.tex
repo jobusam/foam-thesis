@@ -1,46 +1,45 @@
 \chapter{Allgemeines}
 
 \section{Analyse ähnlicher Projekte und Produkte}
-Im Bereich der IT-Sicherheit und Incident Response existiert für Unternehmensinfrastrukturen das Apache Projekt \textit{Metron}, welches auf dem Hadoop Framework aufbaut.\footnote{Siehe \url{https://metron.apache.org/} (Stand: 5.3.2018).}\\ Ziel dieses Projektes ist es Sicherheitsvorfälle zu finden und zu analysieren. Hierbei kann Apache Metron auch mit Telemetriedaten umgehen.\footnote{Siehe \url{https://www.heise.de/developer/meldung/Cybersecurity-Apache-Metron-wird-Top-Level-Projekt-3695901.html} (Stand: 5.3.2018)}\\
-Eine entsprechende Abgrenzung zu diesem Projekt besteht aufgrund der unterschiedlichen Projektziele. Diese Thesis bezieht sich auf die forensische Analyse von Beweismitteln und informationstechnischen Systemen. Es ist nicht das Ziel Sicherheitsvorfälle in unternehmenskritischen Infrastrukturen zu analysieren.\\
+Im Bereich der IT-Sicherheit und Incident Response für Unternehmensinfrastrukturen, existiert das Apache Projekt \textit{Metron}, welches auf dem Hadoop-Ökosystem aufbaut.\footnote{Siehe Link: \url{https://metron.apache.org/}. Letzter Zugriff: 5.3.2018.}\\ Ziel dieses Projektes ist es, Sicherheitsvorfälle zu finden und zu analysieren. Hierbei kann Apache Metron auch mit Telemetriedaten umgehen.\footnote{Siehe Link: \url{https://www.heise.de/developer/meldung/Cybersecurity-Apache-Metron-wird-Top-Level-Projekt-3695901.html}. Letzter Zugriff: 5.3.2018.}\\
+Eine entsprechende Abgrenzung zu diesem Projekt besteht aufgrund der unterschiedlichen Projektziele. Diese Thesis bezieht sich auf die forensische Analyse von Asservaten und informationstechnischen Systemen. Es ist nicht das Ziel, Sicherheitsvorfälle in unternehmenskritischen Infrastrukturen zu analysieren.\\
 
 \noindent
-Das Open-Source Framework \textit{Turbinia} ist ein weiteres Projekt, welches ähnliche Ziele verfolgt.\footnote{Siehe \url{https://github.com/google/turbinia} (Stand 5.3.2018).}
-Der Grundgedanke ist die Automatisierung und Skalierung forensischer Analysen in Computer-Clustern. Prinzipiell hat dieses Projekt das gleiche Ziel, wie diese Masterthesis. Aufwendige Analysen sollen parallelisiert  verarbeitet werden, um sie schneller zu verarbeiten. Das Projekt ist aktiv\footnote{Dies ist daran erkennbar, dass der letzte Commit in das Github-Repository am 26.01.2018 erfolgte.}. 
-Allerdings ist es jedoch in einer frühen Alpha-Phase und daher noch nicht ausgereift. Dieses Projekt basiert auch auf einer Master-Client Architektur. Es bietet aber keine Nutzung auf Basis eines verteilten Dateisystems an. Es muss dafür gesorgt werden, dass jeder Knoten auf alle verfügbaren Daten (Beweismittel) zugreifen kann.\\  
-Im Rahmen dieser Thesis hingegen, wird durch die Nutzung von Apache Hadoop, eine verteilte Speicherung von Daten unterstützt. Darüber hinaus werden entwickelte Algorithmen dort ausgeführt, wo die Daten liegen und nicht umgekehrt. \\
+Das Open-Source Framework \textit{Turbinia} ist ein weiteres Projekt, welches ähnliche Ziele verfolgt.\footnote{Siehe Link: \url{https://github.com/google/turbinia}. Letzter Zugriff: 5.3.2018.}
+Der Grundgedanke ist die Automatisierung und Skalierung forensischer Analysen in Computer-Clustern. Prinzipiell hat dieses Projekt das gleiche Ziel, wie diese Masterthesis. Aufwendige Analysen sollen parallelisiert prozessiert werden, um sie schneller zu verarbeiten. Das Projekt wird derzeit aktiv gepflegt.\footnote{Dies ist daran erkennbar, dass der letzte Commit in das Github-Repository am 4.10.2018 erfolgte (Letzter Zugriff: 6.10.2018).} 
+Allerdings ist es noch in einer frühen Alpha-Phase und daher noch nicht ausgereift. Dieses Projekt basiert auch auf einer Master-Client Architektur. Es bietet aber keine Nutzung auf Basis eines verteilten Dateisystems an. Es muss dafür gesorgt werden, dass jeder Knoten auf alle verfügbaren Daten, beziehungsweise Asservate, zugreifen kann.\\  
+Im Rahmen dieser Thesis hingegen, wird durch die Nutzung von Apache Hadoop, eine verteilte Speicherung von Daten unterstützt. Darüber hinaus wird die Datenverarbeitung dort ausgeführt, wo die Daten liegen und nicht umgekehrt. \\
 
 \noindent
-Ein klassisches Analyse-Werkzeug in der Forensik ist \textit{Autopsy}. Es basiert auf \textit{The Sleuth Kit} und ist kostenlos.\footnote{Siehe \url{https://www.sleuthkit.org/autopsy/} (Stand 5.3.2018).} Mit dem Werkzeug können Hashsummen berechnet oder auch Multimediadateien analysiert werden. Autopsy ist ein Single-Node Analyseprogramm und läuft vorzugsweise auf einem eigenen Analyserechner pro Nutzer.\\ 
-Es gibt auch die Möglichkeit das Programm kollaborativ zu verwenden. Dabei gibt es einen zentralen Netzwerkspeicher, welcher alle Beweismittel enthält. Es ist möglich mit mehreren Nutzern parallel am gleichen Fall zu arbeiten und Analyseergebnisse in Echtzeit zu teilen. Diese Art der verteilten Analyse zeigt Ähnlichkeiten zu dieser Thesis auf.\\
-Allerdings geht es bei diesem kollaborativen Ansatz vielmehr darum, an einem großen Fall mit mehreren Nutzern zu arbeiten und Ergebnisse einfacher zusammenzutragen. Einzelne Analysen finden aber immer nur auf einem konkreten Analyserechner statt. Ein parallele Verarbeitung durch eine horizontale Skalierung wird durch die Anzahl parallel arbeitender Nutzer geschaffen. Jedoch kann das System nicht automatisiert einzelne Analysen auf allen verfügbaren Knoten verarbeiten, wie es in dieser Thesis geplant ist.\\
+Ein klassisches Analyse-Werkzeug in der Forensik ist \textit{Autopsy}. Es basiert auf \textit{The Sleuth Kit} und ist kostenlos.\footnote{Siehe Link: \url{https://www.sleuthkit.org/autopsy/}. Letzter Zugriff: 5.3.2018.} Mit dem Werkzeug können Hashsummen berechnet oder auch Multimediadateien analysiert werden. Autopsy ist ein Single-Node Analyseprogramm und läuft vorzugsweise auf einem eigenen Analyserechner pro Nutzer.\\ 
+Es gibt auch die Möglichkeit, das Programm kollaborativ zu verwenden. Dabei gibt es einen zentralen Netzwerkspeicher, welcher alle Beweismittel enthält. Es ist möglich, mit mehreren Nutzern parallel am gleichen Fall zu arbeiten und Analyseergebnisse in Echtzeit zu teilen. Diese Art der verteilten Analyse zeigt Ähnlichkeiten zu dieser Thesis auf.\\
+Allerdings geht es bei diesem kollaborativen Ansatz vielmehr darum, an einem großen Fall mit mehreren Nutzern zu arbeiten und Ergebnisse einfacher zusammenzutragen. Einzelne Analysen finden nur auf einem konkreten Analyserechner statt. Eine parallele Verarbeitung mittels horizontaler Skalierung wird durch die Anzahl parallel arbeitender Nutzer geschaffen. Jedoch kann das System nicht automatisiert einzelne Analysen auf allen verfügbaren Knoten verarbeiten, wie es in dieser Thesis geplant ist.\\
 
 \noindent
-Autopsy selbst bietet keine Möglichkeiten forensische Analysen im Cluster durchzuführen. Allerdings gibt es eine Variante des \textit{The Sleuth Kit}s, welche das gleiche Ziel verfolgt, wie in dieser Thesis. Hierbei wird die Funktionalität des \textit{The Sleuth Kit}s in einen Apache Hadoop Cluster übertragen (siehe \url{https://www.sleuthkit.org/tsk_hadoop/index.php}). Das Projekt selbst nutzt eben Apache Hadoop und auch Apache HBase zur Speicherung von Datenträgern im Cluster. Zur Prozessierung der Daten wird allerdings nicht Apache Spark genutzt, sondern das Hadoop interne Map-Reduce Verfahren. Darüber hinaus wurden seit 2012 keine Änderungen an dem Open-Source Projekt gemacht (siehe Source-Code Repository auf GitHub unter \url{https://github.com/sleuthkit/hadoop_framework}). Es ist nicht bekannt aus welchen Gründen die Datenverarbeitung im Cluster eingestellt wurde.
+Autopsy bietet keine Möglichkeiten, forensische Analysen im Cluster durchzuführen. Allerdings gibt es eine Variante des \textit{The Sleuth Kit}s, welche das gleiche Ziel verfolgt, wie in dieser Thesis. Hierbei wird die Funktionalität des \textit{The Sleuth Kit}s in einen Apache Hadoop Cluster übertragen.\footnote{Siehe Link: \url{https://www.sleuthkit.org/tsk_hadoop/index.php}. Letzter Zugriff: 6.10.2018.} Das Projekt nutzt Apache Hadoop und auch Apache HBase zur Speicherung von Datenträgern im Cluster. Zur Prozessierung der Daten wird allerdings nicht Apache Spark genutzt, sondern das Hadoop interne Map-Reduce Verfahren. Darüber hinaus wird das Projekt seit 2012 nicht mehr gepflegt.\footnote{Siehe Link zum Source-Code Repository auf GitHub unter: \url{https://github.com/sleuthkit/hadoop_framework}. Letzter Zugriff: 6.10.2018.} Es ist nicht bekannt, aus welchen Gründen die Datenverarbeitung im Cluster eingestellt wurde.
 
 \section{Lizenzierungen in dieser Arbeit}
 \label{sec:licencing_issues}
-\begin{itemize}
-\item Die dargestellten Gantt-Diagramme (siehe Abbildungen \ref{fig:ganttA}, \ref{fig:ganttB}, \ref{fig:ganttC}) wurden mit der JavaScript-Bibliothek \textit{dhtmlxGantt} erstellt. Das Projekt selbst ist unter \url{https://github.com/DHTMLX/gantt} zu finden. Der Quellcode ist unter der \textit{GNU GPLv2}-Lizenz lizenziert. Die aktuelle Bibliothek kann unter \url{https://dhtmlx.com/docs/products/dhtmlxGantt/download.shtml} heruntergeladen werden. Stand: 21.3.2018.
-\end{itemize}
+Die dargestellten Gantt-Diagramme (siehe Abbildungen \ref{fig:ganttA}, \ref{fig:ganttB}, \ref{fig:ganttC}) wurden mit der JavaScript-Bibliothek \textit{dhtmlxGantt} erstellt.\footnote{Siehe Link: \url{https://github.com/DHTMLX/gantt}. Letzter Zugriff: 20.04.2018.} Der Quellcode ist unter der \textit{GNU GPLv2}-Lizenz lizenziert. Die aktuelle Bibliothek kann unter folgendem Link: \url{https://dhtmlx.com/docs/products/dhtmlxGantt/download.shtml} heruntergeladen werden (Letzter Zugriff: 21.3.2018).\\
+
 
 \noindent
-Nachfolgend werden die Logos aufgelistet, welche in Abbildung \ref{fig:hadoop_framework_structure} dargestellt werden. Die Logos der Projekte und die Projektnamen sind Handelsmarken der Apache Source Foundation (siehe \url{https://www.apache.org/}). Sie dürfen in Publikationen genutzt werden.\footnote{Siehe auch \url{https://www.apache.org/foundation/marks/}, Stand: 21.3.2018.}
+Nachfolgend werden die Logos aufgelistet, welche in Abbildung \ref{fig:hadoop_framework_structure} dargestellt werden. Die Logos der Projekte und die Projektnamen sind Handelsmarken der Apache Source Foundation.\footnote{Siehe Link: \url{https://www.apache.org/}. Letzter Zugriff: 20.5.2018.} Sie dürfen in Publikationen genutzt werden.\footnote{Siehe Link: \url{https://www.apache.org/foundation/marks/}. Letzter Zugriff: 21.3.2018.}
 
 \begin{itemize}
-\item Apache Ambari\texttrademark\thinspace Logo von \url{https://ambari.apache.org/}, Stand 21.3.2018. 
-\item Apache Hadoop\textsuperscript{\textregistered} Logo von \url{https://hadoop.apache.org/}, Stand 21.3.2018.
-\item Apache Spark\texttrademark\thinspace Logo von \url{https://spark.apache.org/}, Stand 21.3.2018.
-\item Apache HBase\textsuperscript{\textregistered} Logo von \url{https://hbase.apache.org/}, Stand 21.3.2018.
-\item Apache Hive\texttrademark\thinspace Logo von \url{https://hive.apache.org/}, Stand 21.3.2018.
-\item Apache ZooKeeper\texttrademark\thinspace Logo von \url{https://zookeeper.apache.org/}, Stand 21.3.2018.
+\item Apache Ambari\texttrademark\thinspace Logo von \url{https://ambari.apache.org/}. Letzter Zugriff: 21.3.2018. 
+\item Apache Hadoop\textsuperscript{\textregistered} Logo von \url{https://hadoop.apache.org/}. Letzter Zugriff: 21.3.2018.
+\item Apache Spark\texttrademark\thinspace Logo von \url{https://spark.apache.org/}. Letzter Zugriff: 21.3.2018.
+\item Apache HBase\textsuperscript{\textregistered} Logo von \url{https://hbase.apache.org/}. Letzter Zugriff: 21.3.2018.
+\item Apache Hive\texttrademark\thinspace Logo von \url{https://hive.apache.org/}. Letzter Zugriff: 21.3.2018.
+\item Apache ZooKeeper\texttrademark\thinspace Logo von \url{https://zookeeper.apache.org/}. Letzter Zugriff: 21.3.2018.
 \end{itemize}
 
 
 \chapter{Datenimport}
 \section{Konfigurationsdateien}
 \label{sec:appendix_data_import_config_management}
-Nachfolgend werden die minimalen Konfigurationsdateien dargestellt, welche beim Datenimport angegeben werden müssen. Diese werden genutzt um die Verbindung zum HDFS-Dateisystem und zur HBase-Datenbank zu definieren. Letztlich muss in beiden Konfigurationen eigentlich nur der Service-Endpoint konfiguriert werden.
+Nachfolgend werden die minimalen Konfigurationsdateien dargestellt, welche beim Datenimport angegeben werden müssen. Diese werden genutzt, um die Verbindung zum HDFS-Dateisystem und zur HBase-Datenbank zu definieren. Letztlich muss in beiden Konfigurationen der Service-Endpunkt konfiguriert werden.
 \lstinputlisting[label={lst:hdfs_core_xml},caption= Minimale Konfiguration der Datei \textit{hdfs-core.xml},captionpos=b,style=customshell]{resource/appendix/hdfs-core.xml}
 
 \lstinputlisting[label={lst:hbase_site_xml},caption= Minimale Konfiguration der Datei \textit{hbase-site.xml},captionpos=b,style=customshell]{resource/appendix/hbase-site.xml}

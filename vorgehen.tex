@@ -72,7 +72,7 @@ Abbildung \ref{fig:development_environment} skizziert die Komponenten der Entwic
 
 \noindent
 Zur Entwicklung der forensischen Analyseprogramme wird \textit{Eclipse Oxygen} genutzt. Die Anwendungen selbst werden in Java geschrieben.\footnote{Wobei auch Python oder Scala als Programmiersprache genutzt werden kann.} Zum Bauen der ausführbaren \gls{jar} wird \textit{Maven} verwendet. Mit Maven können weitere Java-Bibliotheken 
-in eigenen Programmen auf einfache Weise wiederverwendet werden.\footnote{Diese können über ein zentrales Repository, dem sogenannten \textit{Maven Central Repository} aus dem Internet geladen werden (siehe Link\url{https://search.maven.org/}. Letzter Zugriff 26.8.2018).}\\
+in eigenen Programmen auf einfache Weise wiederverwendet werden.\footnote{Diese können über ein zentrales Repository, dem sogenannten \textit{Maven Central Repository} aus dem Internet geladen werden (siehe Link \url{https://search.maven.org/}. Letzter Zugriff 26.8.2018).}\\
 
 \noindent
 Zusätzlich befindet sich die Entwicklungsumgebung \textit{IntelliJ IDEA} in der kostenlosen Cummunity Variante  auf dem Entwicklungsrechner. Mit der IntelliJ IDEA wird die Datenimport-Anwendung in \textit{Kotlin} entwickelt. Kotlin ist eine statisch typisierte Programmiersprache zur Anwendungsentwicklung auf verschiedenen Plattformen.\footnote{Siehe Link \url{https://kotlinlang.org/}. Letzter Zugriff: 24.8.2018.} Sie ist interoperabel mit Java. Die Anwendungen können in der \textit{Java Virtual Machine} (JVM) ausgeführt werden. Gegenüber Java bietet sie diverse Sprachkonstrukte zur Optimierung des Programmcodes an. Darüber hinaus können alle Bibliotheken aus dem Java-Umfeld auch in Kotlin genutzt werden. Zum Bauen der Kotlin-Anwendungen wird \textit{Gradle} genutzt, welches analog zu Maven Abhängigkeiten zu Drittbibliotheken und deren Versionen verwaltet.\footnote{Siehe auch Kapitel \ref{subsec:data_import_implementation} für weitere Informationen zur Datenimportanwendung.}\\
@@ -90,14 +90,14 @@ Daher werden die einzelne Projekte mithilfe eines Git-Clients auf GitHub version
 Nachfolgende Auflistung zeigt die Aufteilung der Projekte:
 \begin{itemize}
 \item Das Projekt \textit{foam-thesis}\footnote{Die Abkürzung \textit{foam} oder auch \textit{\acrshort{foam}} steht für \textit{\textbf{fo}rensische \textbf{A}nalyseplattfor\textbf{m}}.} enthält die schriftliche Ausarbeitung der Thesis und den Quellcode als Latex-Projekt. Als Entwicklungsumgebung wird \textit{Texmaker} genutzt.\\
-Über den Link \url{https://github.com/jobusam/foam-thesis} ist der aktuelle Stand der Arbeit jederzeit einsehbar.\footnote{Das erstellte PDF-Dokument zum jeweiligen Stand wird im gleichen Projekt versioniert und ist unter dem Link \url{https://github.com/jobusam/foam-thesis/blob/master/main.pdf} verfügbar.}
+Über den Link \url{https://github.com/jobusam/foam-thesis} ist der aktuelle Stand der Arbeit jederzeit einsehbar.\footnote{Das erstellte PDF-Dokument zum jeweiligen Stand wird im gleichen Projekt versioniert und ist unter dem Link \url{https://github.com/jobusam/foam-thesis/blob/master/main.pdf} verfügbar (Letzter Zugriff: 6.10.2018).}
 
 \item Das Projekt \textit{foam-data-import} enthält den Quellcode zum Importieren von Asservaten in das Hadoop-Cluster. Unter \url{https://github.com/jobusam/foam-data-import} befindet sich die Kotlin-Anwendung, welche wiederum mit Gradle gebaut werden kann.
 
 \item Das Projekt \textit{foam-processing-spark} enthält den Quellcode zur Auswertung mit Apache Spark\texttrademark\thinspace. Unter \url{https://github.com/jobusam/foam-processing-spark} befindet sich ein Maven-Projekt, welches wiederum die Java-Anwendung baut. Es werden auch entsprechende Skripte zum Starten von Spark-Anwendungen auf dem lokalen Rechner bereitgestellt. 
 
 %TODO Installationsskripte zu HBase und Solr!
-\item Das Projekt \textit{foam-storage-hadoop} enthält alle Konfigurationsdateien zum Aufsetzen eines Hadoop-Clusters auf einem einzelnem Knoten im \textit{Pseudo-Distributed Mode}.\footnote{Siehe Link \url{https://github.com/jobusam/foam-storage-hadoop/tree/master/hadoop.standalone.configuration}.} Zusätzlich existieren Shell-Skripte zum Starten des Hadoop-Clusters auf einem einzelnen Knoten.\footnote{Siehe Link \url{https://github.com/jobusam/foam-storage-hadoop/tree/master/hadoop.standalone.setup}.} Mithilfe der Skripte aus dem \textit{foam-processing-spark} Projekt können damit Spark-Anwendungen ausgeführt werden.
+\item Das Projekt \textit{foam-storage-hadoop} enthält alle Konfigurationsdateien zum Aufsetzen eines Hadoop-Clusters auf einem einzelnem Knoten im \textit{Pseudo-Distributed Mode}.\footnote{Siehe Link: \url{https://github.com/jobusam/foam-storage-hadoop/tree/master/hadoop.standalone.configuration}. Letzter Zugriff: 6.10.2018.} Zusätzlich existieren Shell-Skripte zum Starten des Hadoop-Clusters auf einem einzelnen Knoten.\footnote{Siehe Link: \url{https://github.com/jobusam/foam-storage-hadoop/tree/master/hadoop.standalone.setup}. Letzter Zugriff: 6.10.2018.} Mithilfe der Skripte aus dem \textit{foam-processing-spark} Projekt können damit Spark-Anwendungen ausgeführt werden.
 \end{itemize}
 
 \noindent

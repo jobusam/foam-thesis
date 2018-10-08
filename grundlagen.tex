@@ -8,7 +8,7 @@ Apache Hadoop\textsuperscript{\textregistered} ist ein etabliertes Java-Framewor
 Das Framework ist für die Ausführung auf Standardhardware konzipiert. Es wird also keine verhältnismäßig teure Spezialhardware benötigt. Das Cluster besteht aus vielen einzelnen Knoten mit Standardhardware, welche im Verhältnis zu Spezialhardware günstiger und leicht ersetzbar ist. Der Ausfall einzelner Knoten wird bei der Datenhaltung entsprechend berücksichtigt. \\
 
 \noindent
-Hadoop selbst besteht aus mehreren Komponenten, welche spezifische Aufgaben übernehmen. Abbildung \ref{fig:hadoop_framework_structure} stellt eine grobe Skizzierung der Komponentenlandschaft der Plattform dar.\footnote{In der Abbildung \ref{fig:hadoop_framework_structure} werden Logos der einzelnen Apache Projekte verwendet. Diese sind Handelsmarken der \textit{Apache Source Foundation} (siehe \url{https://www.apache.org/}). In Kapitel \ref{sec:licencing_issues} im Anhang werden die Logos und deren Herkunft nochmals aufgelistet.}\\
+Hadoop selbst besteht aus mehreren Komponenten, welche spezifische Aufgaben übernehmen. Abbildung \ref{fig:hadoop_framework_structure} stellt eine grobe Skizzierung der Komponentenlandschaft der Plattform dar.\footnote{In der Abbildung \ref{fig:hadoop_framework_structure} werden Logos der einzelnen Apache Projekte verwendet. Diese sind Handelsmarken der \textit{Apache Source Foundation} (siehe Link: \url{https://www.apache.org/}. Letzter Zugriff: 6.10.2018). In Kapitel \ref{sec:licencing_issues} im Anhang werden die Logos und deren Herkunft nochmals aufgelistet.}\\
 
 \begin{figure}[ht]
   \centering
@@ -52,6 +52,8 @@ Das \gls{hdfs} (und auch Hadoop im Allgemeinen) soll horizontal skalierbar sein.
 Das \gls{hdfs} ist auf hohen Datendurchsatz und die Speicherung großer Datenmengen ausgelegt.
 So können einzelne Dateien mehrere Gigabyte bis hin zu Terabyte groß sein und es können mehrere Millionen Dateien im \gls{hdfs} gespeichert werden. Die Optimierung auf einen möglichst hohen Datendurchsatz geht mit einer schlechteren Reaktionszeit im Vergleich zu herkömmlichen Dateisystemen einher.\\
 Das Prinzip \textit{Write-once-Read-many} wird im \gls{hdfs} implementiert. Wenn Daten einmal geschrieben wurden, dann werden sie normalerweise nicht mehr geändert. Dies ermöglicht ein einfacheres Koherenzmodell. Dies fördert den Lesedurchsatz indem die Unterstützung der Modifikation von Daten stark eingeschränkt wird. Ein wahlfreies Schreiben in eine existierende Datei wird beispielsweise nicht unterstützt. Änderungen an Daten, welche von Algorithmen vorgenommen werden, resultieren in neuen Datensätzen.\\
+
+\noindent
 Darüber hinaus gilt das Prinzip der Datenlokalität. Algorithmen werden dort ausgeführt, wo die Daten liegen, um das Transportieren von Daten über das Netzwerk zu vermeiden.\cite{hdfs_architecture}\\
 
 \noindent
@@ -81,7 +83,7 @@ Das \gls{hdfs} selbst kann über mehrere Wege genutzt werden. Es gibt eine Komma
 
 \section{Apache Hadoop YARN}
 \label{sec:theory_yarn}
-\acrshort{yarn} (\acrlong{yarn}) ist eine Ressourcenverwaltung, welche die verfügbaren Ressourcen innerhalb des Hadoop Clusters organisiert und die Ausführungsreihenfolge von Jobs plant und überwacht. Es gibt einen separaten \textit{Resource Manager}, welcher nur die Ressourcen verwaltet. Auf jedem Knoten, der auch Datenverarbeitungen durchführt, ist ein \textit{Node Manager} installiert. Zuletzt gibt es noch einen \textit{Application Manager} für jeden einzelnen Job, der ausgeführt werden soll. Der Application Manager kontrolliert die Ausführung des Jobs.\\
+\acrshort{yarn} (\acrlong{yarn}) ist eine Ressourcenverwaltung, welche die verfügbaren Ressourcen innerhalb des Hadoop Clusters organisiert und die Ausführungsreihenfolge von Jobs plant und überwacht. Es gibt einen separaten \textit{Resource Manager}, welcher nur die Ressourcen verwaltet. Auf jedem Knoten, der auch Datenverarbeitungen durchführt, ist ein \textit{Node Manager} installiert. Zuletzt gibt es noch einen \textit{Application Manager} für jeden einzelnen Job, der ausgeführt werden soll. Der Application Manager kontrolliert die Ausführung des Jobs.
 Abbildung \ref{fig:yarn_cluster_architecture} zeigt die Komponenten von YARN im Cluster.\\
 
 \begin{figure}[ht]
