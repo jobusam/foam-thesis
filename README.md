@@ -4,6 +4,9 @@ This Latex project contains my master thesis.
 The main goal is to build up a forensic analysis platform based on Apache Hadoop ecosystem. 
 See compiled document [thesis.pdf](main.pdf).
 
+Additionally the thesis presentation can be found under [presentation/thesis_presentation.pdf](presentation/thesis_presentation.pdf).
+The diagrams of the thesis and presentation are also available in this repo.
+
 ## Build the document
 
 ### Install software
